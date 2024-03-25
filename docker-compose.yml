@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: ./cbis
+      dockerfile: Dockerfile
+    container_name: web_cbis
+    volumes:
+      - ./cbis:/app
+    expose:
+      - 8000
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
+  db:
+    image: postgres:13.0-alpine
+    container_name: db_cbis
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .db.env
+    restart: unless-stopped
+  nginx:
+    build: ./nginx
+    container_name: nginx_cbis
+    volumes:
+      - ./cbis/staticfiles:/app/staticfiles
+      - ./cbis/mediafiles:/app/mediafiles
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      - web
+    restart: unless-stopped
