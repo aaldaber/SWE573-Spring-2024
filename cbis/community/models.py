@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.template import engines
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 django_engine = engines['django']
@@ -11,6 +12,7 @@ django_engine = engines['django']
 class Community(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)
+    description = models.TextField()
     is_public = models.BooleanField(default=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_communities')
     moderators = models.ManyToManyField(User, related_name='moderated_communities')
@@ -27,6 +29,8 @@ class PostTemplate(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='post_templates')
     name = models.CharField(max_length=255)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_templates')
+    date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -38,7 +42,26 @@ class PostTemplate(models.Model):
 
 
 class Field(models.Model):
-    data_type = models.CharField(max_length=100, unique=True)
+    TEXT = "text"
+    INTEGER = "integer"
+    BOOLEAN = "boolean"
+    FLOAT = "float"
+    DATE = "date"
+    DATETIME = "datetime"
+    FILE = "file"
+    IMAGE = "image"
+
+    TYPE_CHOICES = (
+        (TEXT, "Text"),
+        (INTEGER, "Integer"),
+        (BOOLEAN, "True / False"),
+        (FLOAT, "Float"),
+        (DATE, "Date"),
+        (DATETIME, "Datetime"),
+        (FILE, "File"),
+        (IMAGE, "Image"),
+    )
+    data_type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=100, unique=True)
     html_content = models.TextField()
 
     def __str__(self):
@@ -54,6 +77,7 @@ class TemplateField(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE)
     label = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=0)
+    required = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.template.name} - {self.label}"
@@ -68,8 +92,8 @@ class Post(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts')
     template = models.ForeignKey(PostTemplate, on_delete=models.CASCADE, related_name='posts')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    created_at = models.DateTimeField(auto_now_add=True)
-    edited_at = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.author.username}'s post in {self.community.name}"
@@ -91,7 +115,13 @@ class PostField(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='fields')
     template_field = models.ForeignKey(TemplateField, on_delete=models.CASCADE, related_name='post_fields')
     content_text = models.TextField(blank=True, null=True)
+    content_integer = models.IntegerField(blank=True, null=True)
+    content_boolean = models.BooleanField(blank=True, null=True)
+    content_float = models.FloatField(blank=True, null=True)
+    content_image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     content_file = models.FileField(upload_to='post_files/', blank=True, null=True)
+    content_date = models.DateField(blank=True, null=True)
+    content_datetime = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.post} - {self.template_field.label}"

@@ -4,7 +4,7 @@ from django.utils.html import format_html
 
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'community', 'author', 'created_at', 'edited_at']
+    list_display = ['title', 'community', 'author', 'date_created', 'date_edited']
 
     readonly_fields = ('html_representation',)
 
