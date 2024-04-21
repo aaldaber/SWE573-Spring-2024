@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from community import views as comm_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("communities/", comm_views.community_list),
+    path("communities/<uuid:commid>/templates/", comm_views.community_templates_list),
 ]

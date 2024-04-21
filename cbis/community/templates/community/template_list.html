@@ -1,0 +1,9 @@
+{% extends "community/base.html" %}
+
+{% block content %}
+        <ul>
+            {% for template in template_list %}
+                <li>{{ template.name }}</li>
+            {% endfor %}
+        </ul>
+{% endblock %}
