@@ -1,13 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
 
 <body>
-    <div id="content">
-        {% block content %}{% endblock %}
+<div class="container-fluid">
+    <div class="row">
+        <div id="content" class="col-md-9">
+            {% block content %}{% endblock %}
+        </div>
+        <div id="sidebar" class="col-md-3 bg-light min-vh-100">
+            {% block sidebar %}
+            <ul>
+                <li><a href="{% url 'index' %}">Home</a></li>
+            </ul>
+                <div class="col-12">
+                <button type="button" class="btn btn-success btn-lg">
+				    Create a community
+			    </button>
+                </div>
+            {% endblock %}
+        </div>
     </div>
+</div>
+
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
