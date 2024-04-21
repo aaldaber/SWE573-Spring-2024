@@ -16,6 +16,7 @@ class Community(models.Model):
     is_public = models.BooleanField(default=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_communities')
     moderators = models.ManyToManyField(User, related_name='moderated_communities')
+    followers = models.ManyToManyField(User, related_name='followed_communities')
 
     def __str__(self):
         return self.name

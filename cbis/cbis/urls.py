@@ -20,6 +20,9 @@ from community import views as comm_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("", comm_views.index, name="index"),
+    path("community/create/", comm_views.community_create),
     path("communities/", comm_views.community_list),
     path("communities/<uuid:commid>/templates/", comm_views.community_templates_list),
+    path("communities/<uuid:commid>/<int:postid>/", comm_views.post_detail, name="postdetail"),
 ]
