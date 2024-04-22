@@ -42,7 +42,7 @@ class PostTemplate(models.Model):
         unique_together = ("community", "name",)
 
 
-class Field(models.Model):
+class TemplateField(models.Model):
     TEXT = "text"
     INTEGER = "integer"
     BOOLEAN = "boolean"
@@ -62,20 +62,8 @@ class Field(models.Model):
         (FILE, "File"),
         (IMAGE, "Image"),
     )
-    data_type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=100, unique=True)
-    html_content = models.TextField()
-
-    def __str__(self):
-        return self.data_type
-
-    class Meta:
-        verbose_name = "Field"
-        verbose_name_plural = "Fields"
-
-
-class TemplateField(models.Model):
     template = models.ForeignKey(PostTemplate, on_delete=models.CASCADE, related_name='fields')
-    field = models.ForeignKey(Field, on_delete=models.CASCADE)
+    data_type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=100)
     label = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=0)
     required = models.BooleanField(default=False)
@@ -136,7 +124,11 @@ class PostField(models.Model):
             return ""
 
     def get_html_content(self):
-        template = django_engine.from_string(self.template_field.field.html_content)
+        if self.template_field.data_type == TemplateField.TEXT:
+            template = "<p>{{ content }} </p>"
+        elif self.template_field.data_type == TemplateField.IMAGE:
+            template = '<img src="{{content}}" />'
+        template = django_engine.from_string(template)
         if self.content_text:
             return template.render({"content": self.content_text}, request=None)
         else:

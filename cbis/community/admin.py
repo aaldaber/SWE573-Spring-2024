@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Community, Post, TemplateField, PostField, PostTemplate, Field
+from .models import Community, Post, TemplateField, PostField, PostTemplate
 from django.utils.html import format_html
 
 
@@ -17,5 +17,3 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(TemplateField)
 admin.site.register(PostField)
 admin.site.register(PostTemplate)
-admin.site.register(Field)
-
