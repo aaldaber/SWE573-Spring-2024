@@ -127,7 +127,7 @@ class PostField(models.Model):
         if self.template_field.data_type == TemplateField.TEXT:
             template = "<p>{{ content }} </p>"
         elif self.template_field.data_type == TemplateField.IMAGE:
-            template = '<img src="{{content}}" />'
+            template = '<img src="{{content}}" class="img-fluid" />'
         template = django_engine.from_string(template)
         if self.content_text:
             return template.render({"content": self.content_text}, request=None)

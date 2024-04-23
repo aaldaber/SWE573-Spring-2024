@@ -2,7 +2,7 @@
 {% block content %}
         <ul>
             {% for community in community_list %}
-                <li>{{ community.name }}</li>
+                <li><a href="{% url 'community_detail' community.id %}">{{ community.name }}</a></li>
             {% endfor %}
         </ul>
 {% endblock %}
