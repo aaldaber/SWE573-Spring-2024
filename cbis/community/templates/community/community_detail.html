@@ -6,7 +6,9 @@
   <h5 class="card-header">{{ community.name }}</h5>
   <div class="card-body">
     <p class="card-text">{{ community.description }}</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
+      {% if is_moderator or is_owner %}
+    <a href="{% url 'community_templates_list' community.id %}" class="btn btn-primary">Templates</a>
+      {% endif %}
   </div>
 </div>
     <div class="list-group">

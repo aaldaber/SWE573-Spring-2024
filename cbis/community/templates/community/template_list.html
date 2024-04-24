@@ -1,9 +1,18 @@
 {% extends "community/base.html" %}
+{% block title %}Templates for {{ community.name }}{% endblock %}
 
 {% block content %}
+    <div class="card">
+  <h5 class="card-header">Templates for {{ community.name }}</h5>
+  <div class="card-body">
+      {% if is_moderator or is_owner %}
+    <a href="#" class="btn btn-primary">New template</a>
+      {% endif %}
+  </div>
+</div>
         <ul>
             {% for template in template_list %}
-                <li>{{ template.name }}</li>
+                <li>{{ template.name }}{% if is_owner or is_moderator %}<a href="#" class="btn btn-outline-primary">Edit</a>{% endif %}{% if is_moderator %}<a href="#" class="btn btn-outline-primary">New Post</a>{% endif %}</li>
             {% endfor %}
         </ul>
 {% endblock %}

@@ -45,10 +45,15 @@ def community_detail(request, commid):
     try:
         community = Community.objects.get(pk=commid)
         posts = community.posts.all().order_by('-date_created')
+        is_member = request.user.followed_communities.filter(id=community.id).exists()
+        is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+        is_owner = request.user.owned_communities.filter(id=community.id).exists()
     except Community.DoesNotExist:
         raise Http404
 
-    return render(request, 'community/community_detail.html', {'community': community, 'posts': posts})
+    return render(request, 'community/community_detail.html', {'community': community, 'posts': posts,
+                                                               'is_member': is_member, 'is_moderator': is_moderator,
+                                                               'is_owner': is_owner})
 
 
 def community_list(request):
@@ -59,10 +64,17 @@ def community_list(request):
 def community_templates_list(request, commid):
     try:
         community = Community.objects.get(pk=commid)
+        is_member = request.user.followed_communities.filter(id=community.id).exists()
+        is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+        is_owner = request.user.owned_communities.filter(id=community.id).exists()
     except Community.DoesNotExist:
         raise Http404
 
-    return render(request, 'community/template_list.html', {'template_list': community.post_templates.all()})
+    return render(request, 'community/template_list.html', {'template_list': community.post_templates.all(),
+                                                            'community': community,
+                                                            'is_member': is_member,
+                                                            'is_moderator': is_moderator,
+                                                            'is_owner': is_owner})
 
 
 def community_templates_create(request, commid):
