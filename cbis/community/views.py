@@ -21,7 +21,8 @@ def post_detail(request, commid, postid):
         post = Post.objects.get(pk=postid, community__id=commid)
     except Post.DoesNotExist:
         raise Http404
-    return render(request, 'community/post_detail.html', {'content': post.get_html_content()})
+    return render(request, 'community/post_detail.html', {'content': post.get_html_content(),
+                                                          'post': post})
 
 
 def community_create(request):

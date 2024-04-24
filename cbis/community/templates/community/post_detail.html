@@ -1,4 +1,5 @@
 {% extends "community/base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
 {% block content %}
     {{ content | safe}}
 {% endblock %}
