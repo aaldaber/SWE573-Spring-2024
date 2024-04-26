@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.db.models import Q
 from django.urls import reverse
 from .formsets import TemplateFieldFormSet
-from .forms import CreateCommunityForm
+from .forms import CreateCommunityForm, TemplateForm
 
 
 def index(request):
@@ -78,7 +78,14 @@ def community_templates_list(request, commid):
 
 
 def community_templates_create(request, commid):
-    community = Community.objects.get(pk=commid)
-    template = PostTemplate()
-
-    formset = TemplateFieldFormSet()
+    try:
+        community = Community.objects.get(pk=commid)
+    except Community.DoesNotExist:
+        raise Http404
+    if request.method == 'GET':
+        form = TemplateForm()
+        return render(request, 'community/template_create.html', {'form': form,
+                                                                  'community': community})
+    elif request.method == 'POST':
+        print(request.data)
+        return HttpResponse('hey')

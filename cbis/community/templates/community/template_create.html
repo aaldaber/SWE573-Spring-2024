@@ -1,0 +1,100 @@
+{% extends "community/base.html" %}
+{% block title %}New Template for {{ community.name }}{% endblock %}
+{% block additional_styles %}
+    <style>
+    .ghost {
+        opacity: 0.4;
+    }
+    .list-group {
+        margin: 20px;
+    }
+    button {
+        margin: 40px 20px;
+        float: right;
+    }
+    </style>
+{% endblock %}
+{% block content %}
+    <form method="post">
+          {% csrf_token %}
+        <table>
+              {{form}}
+        </table>
+
+    <div id="demo" class="row">
+    <div class="col">
+        <h5>Availabe fields</h5>
+        <div id="items-1" class="list-group col">
+            <div id="item-text" data-id="text" class="list-group-item nested-1">Text</div>
+            <div id="item-integer" data-id="integer" class="list-group-item nested-1">Integer</div>
+            <div id="item-float" data-id="float" class="list-group-item nested-1">Float</div>
+            <div id="item-boolean" data-id="boolean" class="list-group-item nested-1">Boolean</div>
+            <div id="item-date" data-id="date" class="list-group-item nested-1">Date</div>
+            <div id="item-datetime" data-id="datetime" class="list-group-item nested-1">Datetime</div>
+            <div id="item-file" data-id="file" class="list-group-item nested-1">File</div>
+            <div id="item-image" data-id="image" class="list-group-item nested-1">Image</div>
+        </div>
+    </div>
+    <div class="col">
+        <h5>Place the needed fields to this space</h5>
+        <div id="items-2" class="list-group col" style="min-height: 100px">
+        </div>
+    </div>
+  </div>
+  <button id="submit">Submit</button>
+{% endblock %}
+{% block additional_scripts %}
+    <script>
+
+// List 1
+$('#items-1').sortable({
+    group: {
+        name: 'list',
+        pull: 'clone',
+        put: 'false'
+    },
+    sort: false,
+    animation: 200,
+    ghostClass: 'ghost',
+    onRemove: function (/**Event*/evt) {
+        var origEl = evt.item;
+        var cloneEl = evt.clone;
+        $( "<a href='#' class='remove_field'>Remove</a><br/><label>Label:</label><input type='text' class='label'><br><label>Required:</label><input type='checkbox' class='chkbx'><br>" ).prependTo(origEl);
+
+    }
+});
+
+// List 2
+$('#items-2').sortable({
+    group: 'list',
+    animation: 200,
+    ghostClass: 'ghost',
+});
+
+// Arrays of "data-id"
+$('#submit').click(function(e) {
+    var sort2 = $('#items-2').sortable('toArray');
+    n = sort2.length;
+    i = 0;
+    values = [];
+    reqs = [];
+    $('div[id="items-2"]>div[data-id] > input[class="label"]').each(function( index ) {
+        values.push($(this).val());
+    });
+    $('div[id="items-2"]>div[data-id] > input[class="chkbx"]').each(function( index ) {
+        reqs.push($(this).is(":checked"));
+    });
+    console.log(sort2);
+    console.log(sort2.length);
+    console.log($('#id_name').val());
+    console.log(values);
+    console.log(reqs);
+    e.preventDefault();
+});
+
+$(document).on('click', 'div a.remove_field', function (e) {
+    $(this).closest('div').remove();
+    e.preventDefault();
+});
+  </script>
+{% endblock %}

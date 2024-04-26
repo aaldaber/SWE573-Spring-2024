@@ -6,7 +6,7 @@
   <h5 class="card-header">Templates for {{ community.name }}</h5>
   <div class="card-body">
       {% if is_moderator or is_owner %}
-    <a href="#" class="btn btn-primary">New template</a>
+    <a href="{% url 'community_templates_create' community.id %}" class="btn btn-primary">New template</a>
       {% endif %}
   </div>
 </div>

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <title>{% block title %}{% endblock %}</title>
+    {% block additional_styles %}
+    {% endblock %}
 </head>
 
 <body>
@@ -36,7 +38,11 @@
         </div>
     </div>
 </div>
-
+<script src="{% static 'js/Sortable.min.js' %}"></script>
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/jquery-sortable.js' %}"></script>
 <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+{% block additional_scripts %}
+    {% endblock %}
 </body>
 </html>
