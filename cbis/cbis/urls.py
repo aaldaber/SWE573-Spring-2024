@@ -26,5 +26,7 @@ urlpatterns = [
     path("communities/<uuid:commid>/", comm_views.community_detail, name="community_detail"),
     path("communities/<uuid:commid>/templates/", comm_views.community_templates_list, name="community_templates_list"),
     path("communities/<uuid:commid>/templates/create/", comm_views.community_templates_create, name="community_templates_create"),
+    path("communities/<uuid:commid>/templates/edit/<uuid:template_id>/", comm_views.community_templates_edit, name="community_templates_edit"),
+    path("communities/<uuid:commid>/templates/preview/<uuid:template_id>/", comm_views.community_templates_preview, name="community_templates_preview"),
     path("communities/<uuid:commid>/<int:postid>/", comm_views.post_detail, name="postdetail"),
 ]

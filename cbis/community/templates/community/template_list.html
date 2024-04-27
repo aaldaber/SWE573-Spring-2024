@@ -12,7 +12,7 @@
 </div>
         <ul>
             {% for template in template_list %}
-                <li>{{ template.name }}{% if is_owner or is_moderator %}<a href="#" class="btn btn-outline-primary">Edit</a>{% endif %}{% if is_moderator %}<a href="#" class="btn btn-outline-primary">New Post</a>{% endif %}</li>
+                <li>{{ template.name }}{% if is_owner or is_moderator %}<a href="{% url 'community_templates_edit' community.id template.id %}" class="btn btn-outline-primary">Edit</a>{% endif %}{% if is_moderator %}<a href="#" class="btn btn-outline-primary">New Post</a>{% endif %}</li>
             {% endfor %}
         </ul>
 {% endblock %}

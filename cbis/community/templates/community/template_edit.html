@@ -1,5 +1,5 @@
 {% extends "community/base.html" %}
-{% block title %}New Template for {{ community.name }}{% endblock %}
+{% block title %}Edit Template {{ template.name }}{% endblock %}
 {% block additional_styles %}
     <style>
     .ghost {
@@ -38,6 +38,9 @@
     <div class="col">
         <h5>Place the needed fields to this space</h5>
         <div id="items-2" class="list-group col" style="min-height: 100px">
+            {% for field in template_fields %}
+                {{ field.generate_html_template_edit | safe }}
+            {% endfor %}
         </div>
     </div>
   </div>
@@ -118,7 +121,7 @@ $('#submit').click(function(e) {
     console.log(reqs);
     var all_data = {"values": values, "reqs": reqs, "theorder": sort2, "template_name": template_name}
     $.ajax({
-  url: "{% url 'community_templates_create' community.id %}",
+  url: "{% url 'community_templates_edit' community.id template.id %}",
   type: "POST",
   dataType: "json",
   data: JSON.stringify({payload: all_data,}),

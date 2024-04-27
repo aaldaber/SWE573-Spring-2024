@@ -71,6 +71,9 @@ class TemplateField(models.Model):
     def __str__(self):
         return f"{self.template.name} - {self.label}"
 
+    def generate_html_template_edit(self):
+        return '<div data-id="{}" class="list-group-item nested-1"><a href="#" class="remove_field">Remove</a><br><label>Label:</label><input type="text" class="label" value="{}"><br><label>Required:</label><input type="checkbox" class="chkbx" {}><br><b><i>{}</i></b></div>'.format(self.data_type, self.label, "checked" if self.required else '', dict(self.TYPE_CHOICES).get(self.data_type))
+
     class Meta:
         verbose_name = "Template Field"
         verbose_name_plural = "Template Fields"
