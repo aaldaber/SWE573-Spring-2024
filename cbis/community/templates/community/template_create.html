@@ -20,19 +20,19 @@
         <table>
               {{form}}
         </table>
-
+    </form>
     <div id="demo" class="row">
     <div class="col">
         <h5>Availabe fields</h5>
         <div id="items-1" class="list-group col">
-            <div id="item-text" data-id="text" class="list-group-item nested-1">Text</div>
-            <div id="item-integer" data-id="integer" class="list-group-item nested-1">Integer</div>
-            <div id="item-float" data-id="float" class="list-group-item nested-1">Float</div>
-            <div id="item-boolean" data-id="boolean" class="list-group-item nested-1">Boolean</div>
-            <div id="item-date" data-id="date" class="list-group-item nested-1">Date</div>
-            <div id="item-datetime" data-id="datetime" class="list-group-item nested-1">Datetime</div>
-            <div id="item-file" data-id="file" class="list-group-item nested-1">File</div>
-            <div id="item-image" data-id="image" class="list-group-item nested-1">Image</div>
+            <div id="item-text" data-id="text" class="list-group-item nested-1"><b><i>Text</i></b></div>
+            <div id="item-integer" data-id="integer" class="list-group-item nested-1"><b><i>Integer</i></b></div>
+            <div id="item-float" data-id="float" class="list-group-item nested-1"><b><i>Float</i></b></div>
+            <div id="item-boolean" data-id="boolean" class="list-group-item nested-1"><b><i>Boolean</i></b></div>
+            <div id="item-date" data-id="date" class="list-group-item nested-1"><b><i>Date</i></b></div>
+            <div id="item-datetime" data-id="datetime" class="list-group-item nested-1"><b><i>Datetime</i></b></div>
+            <div id="item-file" data-id="file" class="list-group-item nested-1"><b><i>File</i></b></div>
+            <div id="item-image" data-id="image" class="list-group-item nested-1"><b><i>Image</i></b></div>
         </div>
     </div>
     <div class="col">
@@ -45,6 +45,21 @@
 {% endblock %}
 {% block additional_scripts %}
     <script>
+    function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
 
 // List 1
 $('#items-1').sortable({
@@ -73,22 +88,52 @@ $('#items-2').sortable({
 
 // Arrays of "data-id"
 $('#submit').click(function(e) {
+    var template_name = $('#id_name').val();
+    if (!template_name || template_name.length < 5){
+        alert("You need to enter a valid template name (min. 5 characters)");
+        return false;
+    }
     var sort2 = $('#items-2').sortable('toArray');
-    n = sort2.length;
-    i = 0;
-    values = [];
-    reqs = [];
+    if (!sort2.length) {
+        alert('You need at least one field to create a template');
+        return false;
+    }
+    var values = [];
+    var reqs = [];
     $('div[id="items-2"]>div[data-id] > input[class="label"]').each(function( index ) {
         values.push($(this).val());
     });
     $('div[id="items-2"]>div[data-id] > input[class="chkbx"]').each(function( index ) {
         reqs.push($(this).is(":checked"));
     });
+    values.forEach(function (item, index) {
+        if (!item.length) {
+            alert('You need to fill all Label names for your fields');
+            return false;
+        }
+    });
     console.log(sort2);
-    console.log(sort2.length);
-    console.log($('#id_name').val());
+    console.log(template_name);
     console.log(values);
     console.log(reqs);
+    var all_data = {"values": values, "reqs": reqs, "theorder": sort2, "template_name": template_name}
+    $.ajax({
+  url: "{% url 'community_templates_create' community.id %}",
+  type: "POST",
+  dataType: "json",
+  data: JSON.stringify({payload: all_data,}),
+  headers: {
+    "X-Requested-With": "XMLHttpRequest",
+    "X-CSRFToken": getCookie("csrftoken"),  // don't forget to include the 'getCookie' function
+  },
+  success: (data) => {
+    console.log(data);
+  },
+  error: (error) => {
+    console.log(error);
+    alert(error.responseJSON.error);
+  }
+});
     e.preventDefault();
 });
 

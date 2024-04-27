@@ -1,7 +1,8 @@
+import json
 from django.contrib import messages
 from django.shortcuts import render
 from .models import Community, Post, PostTemplate, TemplateField
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.db.models import Q
 from django.urls import reverse
 from .formsets import TemplateFieldFormSet
@@ -82,10 +83,33 @@ def community_templates_create(request, commid):
         community = Community.objects.get(pk=commid)
     except Community.DoesNotExist:
         raise Http404
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     if request.method == 'GET':
         form = TemplateForm()
         return render(request, 'community/template_create.html', {'form': form,
                                                                   'community': community})
-    elif request.method == 'POST':
-        print(request.data)
-        return HttpResponse('hey')
+    elif request.method == 'POST' and is_ajax:
+        data_types = [x[0] for x in TemplateField.TYPE_CHOICES]
+        try:
+            data = json.load(request)['payload']
+            if PostTemplate.objects.filter(name=data["template_name"], community=community).exists():
+                return JsonResponse({"error": "Template with the same name already exists"}, status=400)
+            for each in data["reqs"]:
+                if type(each) is not bool:
+                    return JsonResponse({"error": "Required type should be boolean"}, status=400)
+            if not all([x.isalnum() for x in data["values"]]):
+                return JsonResponse({"error": "Labels should be alpanumeric"}, status=400)
+            for each in data["theorder"]:
+                if each not in data_types:
+                    return JsonResponse({"error": "Data type {} does not exists in our system".format(each)}, status=400)
+            new_template = PostTemplate(name=data["template_name"], community=community, created_by=request.user)
+            new_template.save()
+            count = 0
+            for each in data["theorder"]:
+                TemplateField(template=new_template, data_type=each, order=count, label=data["values"][count]).save()
+                count += 1
+            return JsonResponse({"template": new_template.id})
+        except Exception as e:
+            print(str(e))
+            return JsonResponse({"error": "Request error, please check your data"}, status=400)
+
