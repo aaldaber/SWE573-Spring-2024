@@ -17,9 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from community import views as comm_views
+from user import views as user_views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('signup/', user_views.signup, name="signup"),
+    path('login/', auth_views.LoginView.as_view(template_name='user/login.html', redirect_authenticated_user=True), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path("", comm_views.index, name="index"),
     path("communities/", comm_views.community_list, name="community_list"),
     path("communities/create/", comm_views.community_create, name="community_create"),

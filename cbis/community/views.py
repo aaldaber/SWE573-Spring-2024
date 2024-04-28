@@ -7,8 +7,10 @@ from django.db.models import Q
 from django.urls import reverse
 from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm
 from django.utils.safestring import mark_safe
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def index(request):
     latest_posts_in_communities = Post.objects.filter(Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |

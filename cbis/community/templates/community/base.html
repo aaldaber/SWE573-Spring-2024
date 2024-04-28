@@ -29,9 +29,12 @@
                 <li><a href="{% url 'index' %}">Home</a></li>
                 <li><a href="{% url 'community_list' %}">Communities</a></li>
             </ul>
-                <div class="col-12">
+                <div class="d-grid gap-2">
                 <a href="{% url 'community_create' %}" class="btn btn-success btn-lg">
 				    Create a community
+			    </a>
+                <a href="{% url 'logout' %}" class="btn btn-danger btn-lg">
+				    Logout
 			    </a>
                 </div>
             {% endblock %}
