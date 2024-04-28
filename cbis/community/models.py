@@ -44,6 +44,7 @@ class PostTemplate(models.Model):
 
 class TemplateField(models.Model):
     TEXT = "text"
+    TEXTAREA = "textarea"
     INTEGER = "integer"
     BOOLEAN = "boolean"
     FLOAT = "float"
@@ -54,6 +55,7 @@ class TemplateField(models.Model):
 
     TYPE_CHOICES = (
         (TEXT, "Text"),
+        (TEXTAREA, "Text Area"),
         (INTEGER, "Integer"),
         (BOOLEAN, "True / False"),
         (FLOAT, "Float"),
@@ -106,7 +108,8 @@ class Post(models.Model):
 class PostField(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='fields')
     template_field = models.ForeignKey(TemplateField, on_delete=models.CASCADE, related_name='post_fields')
-    content_text = models.TextField(blank=True, null=True)
+    content_text = models.CharField(max_length=255, blank=True, null=True)
+    content_textarea = models.TextField(blank=True, null=True)
     content_integer = models.IntegerField(blank=True, null=True)
     content_boolean = models.BooleanField(blank=True, null=True)
     content_float = models.FloatField(blank=True, null=True)
