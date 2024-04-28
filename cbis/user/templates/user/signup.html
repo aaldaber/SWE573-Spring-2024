@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <title>Sign up</title>
+</head>
+<body>
+<div class="container-fluid content">
+    <form method="post">
+    {% csrf_token %}
+        <legend><span class="col-sm-offset-1">Sign up</span></legend>
+    {% for field in form %}
+            {% include 'user/form_field.html' %}
+    {% endfor %}
+    <button type="submit" class="btn btn-outline-primary">Sign up</button>
+        &nbsp;<a href="{% url 'login' %}" class="btn btn-outline-info">Log in</a>
+    </form>
+</div>
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

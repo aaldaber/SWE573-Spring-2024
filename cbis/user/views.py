@@ -1,3 +1,4 @@
+import uuid
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import SignupForm
@@ -8,6 +9,9 @@ def signup(request):
         return redirect('index')
     if request.method == 'POST':
         form = SignupForm(request.POST)
+        if not form.data.get("username"):
+            form.data = form.data.copy()
+            form.data["username"] = str(uuid.uuid4())
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -15,4 +19,3 @@ def signup(request):
     else:
         form = SignupForm()
     return render(request, 'user/signup.html', {'form': form})
-
