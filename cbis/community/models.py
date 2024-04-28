@@ -121,24 +121,36 @@ class PostField(models.Model):
     def __str__(self):
         return f"{self.post} - {self.template_field.label}"
 
-    def get_content(self):
-        if self.content_text:
-            return self.content_text
-        elif self.content_file:
-            return self.content_file.url
-        else:
-            return ""
-
     def get_html_content(self):
         if self.template_field.data_type == TemplateField.TEXT:
-            template = "<p>{{ content }} </p>"
+            template = "{{ content }}"
+            data = self.content_text
         elif self.template_field.data_type == TemplateField.IMAGE:
             template = '<img src="{{content}}" class="img-fluid" />'
+            data = self.content_image.url
+        elif self.template_field.data_type == TemplateField.FILE:
+            template = '<a href="{{content}}"/>File</a>'
+            data = self.content_file.url
+        elif self.template_field.data_type == TemplateField.INTEGER:
+            template = "{{ content }}"
+            data = self.content_integer
+        elif self.template_field.data_type == TemplateField.BOOLEAN:
+            template = "{{ content }}"
+            data = "True" if self.content_boolean else "False"
+        elif self.template_field.data_type == TemplateField.FLOAT:
+            template = "{{ content }}"
+            data = self.content_float
+        elif self.template_field.data_type == TemplateField.TEXTAREA:
+            template = "<p>{{ content }} </p>"
+            data = self.content_textarea
+        elif self.template_field.data_type == TemplateField.DATE:
+            template = "{{ content }}"
+            data = self.content_date
+        elif self.template_field.data_type == TemplateField.DATETIME:
+            template = "{{ content }}"
+            data = self.content_datetime
         template = django_engine.from_string(template)
-        if self.content_text:
-            return template.render({"content": self.content_text}, request=None)
-        else:
-            return template.render({"content": self.content_file.url}, request=None)
+        return template.render({"content": data}, request=None)
 
     class Meta:
         verbose_name = "Post Field"

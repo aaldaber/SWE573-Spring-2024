@@ -1,0 +1,12 @@
+{% extends "community/base.html" %}
+{% block title %}New post in community {{ community.name }}{% endblock %}
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        <table>
+              {{ form1 }}
+              {{form}}
+        </table>
+    <button type="submit">Submit</button>
+    </form>
+{% endblock %}

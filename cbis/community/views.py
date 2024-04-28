@@ -1,11 +1,12 @@
 import json
 from django.contrib import messages
 from django.shortcuts import render
-from .models import Community, Post, PostTemplate, TemplateField
+from .models import Community, Post, PostTemplate, TemplateField, PostField
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.db.models import Q
 from django.urls import reverse
-from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm
+from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm
+from django.utils.safestring import mark_safe
 
 
 def index(request):
@@ -181,3 +182,44 @@ def community_templates_preview(request, commid, template_id):
     if request.method == 'GET':
         form = TemplatePreviewForm(fields=template.fields.all().order_by('order'))
         return render(request, 'community/template_preview.html', {'form': form, 'template': template})
+
+
+def community_new_post(request, commid, template_id):
+    try:
+        community = Community.objects.get(pk=commid)
+        template = PostTemplate.objects.get(pk=template_id)
+    except Community.DoesNotExist:
+        raise Http404
+    except PostTemplate.DoesNotExist:
+        raise Http404
+    if request.method == 'GET':
+        form1 = PostForm()
+        form = TemplatePreviewForm(fields=template.fields.all().order_by('order'))
+        return render(request, 'community/new_post.html', {'form': form,
+                                                           'form1': form1,
+                                                           'template': template,
+                                                           'community': community})
+    elif request.method == 'POST':
+        form = TemplatePreviewForm(fields=template.fields.all().order_by('order'), data=request.POST, files=request.FILES)
+        form1 = PostForm(data=request.POST)
+        if form.is_valid() and form1.is_valid():
+            new_post = Post(title=form1.cleaned_data['post_title'], community=community, template=template,
+                            author=request.user)
+            new_post.save()
+            for each in template.fields.all().order_by('order'):
+                if form.cleaned_data.get(each.label):
+                    post_field = PostField(post=new_post, template_field=each)
+                    setattr(post_field, "content_{}".format(each.data_type), form.cleaned_data.get(each.label))
+                    post_field.save()
+            return HttpResponseRedirect(reverse("postdetail", args=(community.id, new_post.id,)))
+        else:
+            errors = ''
+            if form.errors:
+                errors += str(form.errors)
+            if form1.errors:
+                errors += str(form1.errors)
+            messages.warning(request, mark_safe(errors))
+            return render(request, 'community/new_post.html', {'form': form,
+                                                               'form1': form1,
+                                                               'template': template,
+                                                               'community': community})

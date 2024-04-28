@@ -1,5 +1,6 @@
 from django import forms
-from .models import TemplateField, PostTemplate, Community
+from .models import PostTemplate, Community
+from django.forms.utils import pretty_name
 
 
 class CreateCommunityForm(forms.ModelForm):
@@ -12,6 +13,10 @@ class TemplateForm(forms.ModelForm):
     class Meta:
         model = PostTemplate
         fields = ["name"]
+
+
+class PostForm(forms.Form):
+    post_title = forms.CharField(max_length=255, required=True)
 
 
 class TemplatePreviewForm(forms.Form):
@@ -29,12 +34,12 @@ class TemplatePreviewForm(forms.Form):
             elif each.data_type == "boolean":
                 self.fields[field_name] = forms.BooleanField(required=False)
             elif each.data_type == "float":
-                self.fields[field_name] = forms.FloatField()
+                self.fields[field_name] = forms.FloatField(required=each.required)
             elif each.data_type == "date":
-                self.fields[field_name] = forms.DateField(input_formats=['%d-%m-%Y'], label="{} (DD-MM-YYYY)".format(field_name))
+                self.fields[field_name] = forms.DateField(required=each.required, input_formats=['%d-%m-%Y'], label="{} (DD-MM-YYYY)".format(pretty_name(field_name)))
             elif each.data_type == "datetime":
-                self.fields[field_name] = forms.DateTimeField()
+                self.fields[field_name] = forms.DateTimeField(required=each.required, input_formats=['%d-%m-%Y %H:%M'], label="{} (DD-MM-YYYY HH:MM)".format(pretty_name(field_name)))
             elif each.data_type == "file":
-                self.fields[field_name] = forms.FileField()
+                self.fields[field_name] = forms.FileField(required=each.required)
             elif each.data_type == "image":
-                self.fields[field_name] = forms.ImageField()
+                self.fields[field_name] = forms.ImageField(required=each.required)
