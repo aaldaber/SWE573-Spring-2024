@@ -77,6 +77,49 @@ def community_templates_list(request, commid):
                                                             'is_owner': is_owner})
 
 
+def validate_template_json(data, community, user, create_or_edit, template=None):
+    data_types = [x[0] for x in TemplateField.TYPE_CHOICES]
+    if not data["template_name"].replace(' ', '').isalnum() or len(data["template_name"].replace(' ', '')) < 5:
+        return JsonResponse({"error": "Template name should be alphanumeric and at least 5 characters in length"},
+                            status=400)
+    if create_or_edit == "create":
+        if PostTemplate.objects.filter(name=data["template_name"], community=community).exists():
+            return JsonResponse({"error": "Template with the same name already exists"}, status=400)
+    elif create_or_edit == "edit":
+        if PostTemplate.objects.filter(name=data["template_name"], community=community).exclude(
+                id=template.id).exists():
+            return JsonResponse({"error": "Template with the same name already exists"}, status=400)
+    for each in data["reqs"]:
+        if type(each) is not bool:
+            return JsonResponse({"error": "Required type should be boolean"}, status=400)
+    if not all([x.replace(' ', '').isalnum() for x in data["values"]]):
+        return JsonResponse({"error": "Labels should be alpanumeric"}, status=400)
+    if len(data["values"]) != len(set(data["values"])):
+        return JsonResponse({"error": "Labels should be unique"}, status=400)
+    for each in data["theorder"]:
+        if each not in data_types:
+            return JsonResponse({"error": "Data type {} does not exists in our system".format(each)}, status=400)
+    if create_or_edit == "create":
+        new_template = PostTemplate(name=data["template_name"], community=community, created_by=user)
+        new_template.save()
+        count = 0
+        for each in data["theorder"]:
+            TemplateField(template=new_template, data_type=each, order=count, label=data["values"][count],
+                          required=data["reqs"][count]).save()
+            count += 1
+        return JsonResponse({"template": new_template.id})
+    elif create_or_edit == "edit":
+        template.name = data["template_name"]
+        template.save()
+        template.fields.all().delete()
+        count = 0
+        for each in data["theorder"]:
+            TemplateField(template=template, data_type=each, order=count, label=data["values"][count],
+                          required=data["reqs"][count]).save()
+            count += 1
+        return JsonResponse({"template": template.id})
+
+
 def community_templates_create(request, commid):
     try:
         community = Community.objects.get(pk=commid)
@@ -88,30 +131,9 @@ def community_templates_create(request, commid):
         return render(request, 'community/template_create.html', {'form': form,
                                                                   'community': community})
     elif request.method == 'POST' and is_ajax:
-        data_types = [x[0] for x in TemplateField.TYPE_CHOICES]
         try:
             data = json.load(request)['payload']
-            if not data["template_name"].replace(' ', '').isalnum() or len(data["template_name"].replace(' ', '').strip()) < 5:
-                return JsonResponse({"error": "Template name should be alphanumeric and at least 5 characters in length"}, status=400)
-            if PostTemplate.objects.filter(name=data["template_name"], community=community).exists():
-                return JsonResponse({"error": "Template with the same name already exists"}, status=400)
-            for each in data["reqs"]:
-                if type(each) is not bool:
-                    return JsonResponse({"error": "Required type should be boolean"}, status=400)
-            if not all([x.replace(' ', '').isalnum() for x in data["values"]]):
-                return JsonResponse({"error": "Labels should be alpanumeric"}, status=400)
-            if len(data["values"]) != len(set(data["values"])):
-                return JsonResponse({"error": "Labels should be unique"}, status=400)
-            for each in data["theorder"]:
-                if each not in data_types:
-                    return JsonResponse({"error": "Data type {} does not exists in our system".format(each)}, status=400)
-            new_template = PostTemplate(name=data["template_name"], community=community, created_by=request.user)
-            new_template.save()
-            count = 0
-            for each in data["theorder"]:
-                TemplateField(template=new_template, data_type=each, order=count, label=data["values"][count], required=data["reqs"][count]).save()
-                count += 1
-            return JsonResponse({"template": new_template.id})
+            return validate_template_json(data, community, request.user, "create")
         except Exception as e:
             print(str(e))
             return JsonResponse({"error": "Request error, please check your data"}, status=400)
@@ -137,34 +159,12 @@ def community_templates_edit(request, commid, template_id):
                                                                   'template_fields': template.fields.all().order_by('order'),
                                                                 })
     elif request.method == 'POST' and is_ajax:
-        data_types = [x[0] for x in TemplateField.TYPE_CHOICES]
         if template.posts.count():
             return JsonResponse({"error": "You cannot edit a template that has associated posts"},
                                 status=400)
         try:
             data = json.load(request)['payload']
-            if not data["template_name"].replace(' ', '').isalnum() or len(data["template_name"].replace(' ', '')) < 5:
-                return JsonResponse({"error": "Template name should be alphanumeric and at least 5 characters in length"}, status=400)
-            if PostTemplate.objects.filter(name=data["template_name"], community=community).exclude(id=template.id).exists():
-                return JsonResponse({"error": "Template with the same name already exists"}, status=400)
-            for each in data["reqs"]:
-                if type(each) is not bool:
-                    return JsonResponse({"error": "Required type should be boolean"}, status=400)
-            if not all([x.replace(' ', '').isalnum() for x in data["values"]]):
-                return JsonResponse({"error": "Labels should be alpanumeric"}, status=400)
-            if len(data["values"]) != len(set(data["values"])):
-                return JsonResponse({"error": "Labels should be unique"}, status=400)
-            for each in data["theorder"]:
-                if each not in data_types:
-                    return JsonResponse({"error": "Data type {} does not exists in our system".format(each)}, status=400)
-            template.name = data["template_name"]
-            template.save()
-            template.fields.all().delete()
-            count = 0
-            for each in data["theorder"]:
-                TemplateField(template=template, data_type=each, order=count, label=data["values"][count], required=data["reqs"][count]).save()
-                count += 1
-            return JsonResponse({"template": template.id})
+            return validate_template_json(data, community, request.user, "edit", template)
         except Exception as e:
             print(str(e))
             return JsonResponse({"error": "Request error, please check your data"}, status=400)

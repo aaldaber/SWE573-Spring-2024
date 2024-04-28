@@ -25,14 +25,14 @@
     <div class="col">
         <h5>Availabe fields</h5>
         <div id="items-1" class="list-group col">
-            <div id="item-text" data-id="text" class="list-group-item nested-1"><b><i>Text</i></b></div>
-            <div id="item-integer" data-id="integer" class="list-group-item nested-1"><b><i>Integer</i></b></div>
-            <div id="item-float" data-id="float" class="list-group-item nested-1"><b><i>Float</i></b></div>
-            <div id="item-boolean" data-id="boolean" class="list-group-item nested-1"><b><i>Boolean</i></b></div>
-            <div id="item-date" data-id="date" class="list-group-item nested-1"><b><i>Date</i></b></div>
-            <div id="item-datetime" data-id="datetime" class="list-group-item nested-1"><b><i>Datetime</i></b></div>
-            <div id="item-file" data-id="file" class="list-group-item nested-1"><b><i>File</i></b></div>
-            <div id="item-image" data-id="image" class="list-group-item nested-1"><b><i>Image</i></b></div>
+            <div data-id="text" class="list-group-item nested-1"><b><i>Text</i></b></div>
+            <div data-id="integer" class="list-group-item nested-1"><b><i>Integer</i></b></div>
+            <div data-id="float" class="list-group-item nested-1"><b><i>Float</i></b></div>
+            <div data-id="boolean" class="list-group-item nested-1"><b><i>Boolean</i></b></div>
+            <div data-id="date" class="list-group-item nested-1"><b><i>Date</i></b></div>
+            <div data-id="datetime" class="list-group-item nested-1"><b><i>Datetime</i></b></div>
+            <div data-id="file" class="list-group-item nested-1"><b><i>File</i></b></div>
+            <div data-id="image" class="list-group-item nested-1"><b><i>Image</i></b></div>
         </div>
     </div>
     <div class="col">
@@ -109,12 +109,17 @@ $('#submit').click(function(e) {
     $('div[id="items-2"]>div[data-id] > input[class="chkbx"]').each(function( index ) {
         reqs.push($(this).is(":checked"));
     });
+    var all_labels_valid = true;
     values.forEach(function (item, index) {
         if (!item.length) {
             alert('You need to fill all Label names for your fields');
+            all_labels_valid = false;
             return false;
         }
     });
+    if (!all_labels_valid) {
+        return false;
+    }
     console.log(sort2);
     console.log(template_name);
     console.log(values);
