@@ -4,6 +4,9 @@ from django.forms.utils import pretty_name
 
 
 class CreateCommunityForm(forms.ModelForm):
+    name = forms.CharField(required=True, label="Community name", widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': '90s Music'}))
+    description = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': 'form-control input-lg'}))
+
     class Meta:
         model = Community
         fields = ["name", "description", "is_public"]
