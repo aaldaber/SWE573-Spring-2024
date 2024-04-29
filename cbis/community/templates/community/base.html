@@ -25,6 +25,7 @@
         </div>
         <div id="sidebar" class="col-md-3 bg-light min-vh-100">
             {% block sidebar %}
+                <legend><span class="col-sm-offset-1">Welcome, {{ request.user.username }}!</span></legend>
             <ul>
                 <li><a href="{% url 'index' %}">Home</a></li>
                 <li><a href="{% url 'community_list' %}">Communities</a></li>
