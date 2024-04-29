@@ -146,7 +146,7 @@ def community_templates_create(request, commid):
 def community_templates_edit(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
-        template = PostTemplate.objects.get(pk=template_id)
+        template = PostTemplate.objects.get(pk=template_id, community=community)
     except Community.DoesNotExist:
         raise Http404
     except PostTemplate.DoesNotExist:
@@ -177,7 +177,7 @@ def community_templates_edit(request, commid, template_id):
 def community_templates_preview(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
-        template = PostTemplate.objects.get(pk=template_id)
+        template = PostTemplate.objects.get(pk=template_id, community=community)
     except Community.DoesNotExist:
         raise Http404
     except PostTemplate.DoesNotExist:
@@ -190,7 +190,7 @@ def community_templates_preview(request, commid, template_id):
 def community_new_post(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
-        template = PostTemplate.objects.get(pk=template_id)
+        template = PostTemplate.objects.get(pk=template_id, community=community)
     except Community.DoesNotExist:
         raise Http404
     except PostTemplate.DoesNotExist:
