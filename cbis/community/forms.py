@@ -22,7 +22,7 @@ class TemplateForm(forms.ModelForm):
 
 
 class PostForm(forms.Form):
-    post_title = forms.CharField(max_length=255, required=True)
+    post_title = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={'class': 'form-control input-lg'}))
 
 
 class TemplatePreviewForm(forms.Form):
@@ -32,20 +32,20 @@ class TemplatePreviewForm(forms.Form):
         for each in fields:
             field_name = each.label
             if each.data_type == "text":
-                self.fields[field_name] = forms.CharField(required=each.required)
+                self.fields[field_name] = forms.CharField(required=each.required, widget=forms.TextInput(attrs={'class': 'form-control input-lg'}))
             if each.data_type == "textarea":
-                self.fields[field_name] = forms.CharField(required=each.required, widget=forms.Textarea(attrs={"rows":"5"}))
+                self.fields[field_name] = forms.CharField(required=each.required, widget=forms.Textarea(attrs={'class': 'form-control input-lg', "rows":"5"}))
             elif each.data_type == "integer":
-                self.fields[field_name] = forms.IntegerField(required=each.required)
+                self.fields[field_name] = forms.IntegerField(required=each.required, widget=forms.NumberInput(attrs={'class': 'form-control input-lg'}))
             elif each.data_type == "boolean":
                 self.fields[field_name] = forms.BooleanField(required=False)
             elif each.data_type == "float":
-                self.fields[field_name] = forms.FloatField(required=each.required)
+                self.fields[field_name] = forms.FloatField(required=each.required, widget=forms.NumberInput(attrs={'class': 'form-control input-lg'}))
             elif each.data_type == "date":
-                self.fields[field_name] = forms.DateField(required=each.required, input_formats=['%d-%m-%Y'], label="{} (DD-MM-YYYY)".format(pretty_name(field_name)))
+                self.fields[field_name] = forms.DateField(required=each.required, input_formats=['%d-%m-%Y'], label="{} (DD-MM-YYYY)".format(pretty_name(field_name)), widget=forms.DateInput(attrs={'class': 'form-control input-lg'}))
             elif each.data_type == "datetime":
-                self.fields[field_name] = forms.DateTimeField(required=each.required, input_formats=['%d-%m-%Y %H:%M'], label="{} (DD-MM-YYYY HH:MM)".format(pretty_name(field_name)))
+                self.fields[field_name] = forms.DateTimeField(required=each.required, input_formats=['%d-%m-%Y %H:%M'], label="{} (DD-MM-YYYY HH:MM)".format(pretty_name(field_name)), widget=forms.DateTimeInput(attrs={'class': 'form-control input-lg'}))
             elif each.data_type == "file":
-                self.fields[field_name] = forms.FileField(required=each.required)
+                self.fields[field_name] = forms.FileField(required=each.required, widget=forms.FileInput(attrs={'class': 'form-control'}))
             elif each.data_type == "image":
-                self.fields[field_name] = forms.ImageField(required=each.required)
+                self.fields[field_name] = forms.ImageField(required=each.required, widget=forms.FileInput(attrs={'class': 'form-control'}))
