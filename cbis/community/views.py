@@ -14,7 +14,8 @@ from django.contrib.auth.decorators import login_required
 def index(request):
     latest_posts_in_communities = Post.objects.filter(Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |
-                                                      Q(community__owner=request.user)).order_by('-date_created')
+                                                      Q(community__owner=request.user) |
+                                                      Q(community__is_public=True)).order_by('-date_created')[:10]
     list_of_public_communities = Community.objects.filter(is_public=True)
     return render(request, 'community/index.html', {'posts': latest_posts_in_communities})
 
