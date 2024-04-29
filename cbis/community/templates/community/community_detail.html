@@ -9,6 +9,7 @@
       {% if is_moderator or is_owner %}
     <a href="{% url 'community_templates_list' community.id %}" class="btn btn-primary">Templates</a>
       {% endif %}
+  <a href="{% url 'community_templates_list' community.id %}" class="btn btn-primary">New post</a>
   </div>
 </div>
     <div class="list-group">
