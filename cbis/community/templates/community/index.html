@@ -1,9 +1,10 @@
 {% extends "community/base.html" %}
 {% block title %}Homepage{% endblock %}
 {% block content %}
+    <legend><span class="col-sm-offset-1">Latest 10 posts</span></legend>
         <ul>
             {% for post in posts %}
-                <li><a href="{% url 'postdetail' post.community.id post.id %}">{{ post.title }}</a></li>
+                <li><a href="{% url 'postdetail' post.community.id post.id %}">{{ post.title }}</a> in {{ post.community.name }} by <i>{{ post.author.username }}</i></li>
             {% endfor %}
         </ul>
 {% endblock %}
