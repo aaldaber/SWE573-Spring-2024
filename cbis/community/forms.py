@@ -13,6 +13,9 @@ class CreateCommunityForm(forms.ModelForm):
 
 
 class TemplateForm(forms.ModelForm):
+    name = forms.CharField(required=True, label="Template name",
+                           widget=forms.TextInput(attrs={'class': 'form-control input-lg'}))
+
     class Meta:
         model = PostTemplate
         fields = ["name"]
