@@ -12,6 +12,28 @@
 
 <body>
 <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src="{% static 'img/logo.jpeg' %}" width="60px"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'index' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'community_list' %}">Communities</a>
+            </li>
+          </ul>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Go</button>
+          </form>
+        </div>
+      </div>
+    </nav>
     <div class="row">
         <div id="content" class="col-md-9">
         {% if messages %}
@@ -26,10 +48,6 @@
         <div id="sidebar" class="col-md-3 bg-light min-vh-100">
             {% block sidebar %}
                 <legend><span class="col-sm-offset-1">Welcome, {{ request.user.username }}!</span></legend>
-            <ul>
-                <li><a href="{% url 'index' %}">Home</a></li>
-                <li><a href="{% url 'community_list' %}">Communities</a></li>
-            </ul>
                 <div class="d-grid gap-2">
                 <a href="{% url 'community_create' %}" class="btn btn-success btn-lg">
 				    Create a community
