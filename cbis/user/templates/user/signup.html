@@ -9,6 +9,9 @@
 </head>
 <body>
 <div class="container-fluid content">
+    <div class="text-center">
+        <img src="{% static 'img/logo.jpeg' %}" width="200px" class="rounded-circle" alt="Site Logo">
+    </div>
     <form method="post">
     {% csrf_token %}
         <legend><span class="col-sm-offset-1">Sign up</span></legend>
