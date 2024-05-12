@@ -2,7 +2,7 @@ import json
 from django.contrib import messages
 from django.shortcuts import render
 from .models import Community, Post, PostTemplate, TemplateField, PostField
-from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.db.models import Q, Count
 from django.urls import reverse
 from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm
@@ -33,16 +33,26 @@ def index(request):
                                                     'most_viewed_all': most_viewed_posts_all_time})
 
 
+@login_required
 def post_detail(request, commid, postid):
     try:
-        post = Post.objects.get(pk=postid, community__id=commid)
-        post_viewed.send(sender=None, instance=post, request=request)
+        community = Community.objects.get(pk=commid)
+        if community.is_public or community.followers.filter(id=request.user.id).exists() or \
+                community.moderators.filter(id=request.user.id).exists() or \
+                community.owner == request.user:
+            post = Post.objects.get(pk=postid, community=community)
+            post_viewed.send(sender=None, instance=post, request=request)
+        else:
+            return HttpResponseForbidden()
     except Post.DoesNotExist:
+        raise Http404
+    except Community.DoesNotExist:
         raise Http404
     return render(request, 'community/post_detail.html', {'content': post.get_html_content(),
                                                           'post': post})
 
 
+@login_required
 def community_create(request):
     if request.method == 'GET':
         create_form = CreateCommunityForm()
@@ -59,11 +69,15 @@ def community_create(request):
             return render(request, 'community/community_create.html', {'form': create_form})
 
 
+@login_required
 def community_edit(request, commid):
     try:
         community = Community.objects.get(pk=commid)
     except Community.DoesNotExist:
         raise Http404
+    if not community.moderators.filter(id=request.user.id).exists() and \
+            not community.owner == request.user:
+        return HttpResponseForbidden()
     if request.method == 'GET':
         create_form = CreateCommunityForm(instance=community)
         return render(request, 'community/community_edit.html', {'form': create_form, 'community': community})
@@ -78,13 +92,17 @@ def community_edit(request, commid):
             return render(request, 'community/community_edit.html', {'form': create_form, 'community': community})
 
 
+@login_required
 def community_detail(request, commid):
     try:
         community = Community.objects.get(pk=commid)
-        posts = community.posts.all().order_by('-date_created')
         is_member = request.user.followed_communities.filter(id=community.id).exists()
         is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
         is_owner = request.user.owned_communities.filter(id=community.id).exists()
+        if not community.is_public and not is_member and \
+                not is_moderator and not is_owner:
+            return HttpResponseForbidden()
+        posts = community.posts.all().order_by('-date_created')
     except Community.DoesNotExist:
         raise Http404
 
