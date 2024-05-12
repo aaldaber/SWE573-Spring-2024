@@ -30,6 +30,7 @@ urlpatterns = [
     path("communities/", comm_views.community_list, name="community_list"),
     path("communities/create/", comm_views.community_create, name="community_create"),
     path("communities/<uuid:commid>/", comm_views.community_detail, name="community_detail"),
+    path("communities/<uuid:commid>/edit/", comm_views.community_edit, name="community_edit"),
     path("communities/<uuid:commid>/templates/", comm_views.community_templates_list, name="community_templates_list"),
     path("communities/<uuid:commid>/templates/create/", comm_views.community_templates_create, name="community_templates_create"),
     path("communities/<uuid:commid>/templates/edit/<uuid:template_id>/", comm_views.community_templates_edit, name="community_templates_edit"),

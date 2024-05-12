@@ -1,15 +1,24 @@
 from django import forms
 from .models import PostTemplate, Community
 from django.forms.utils import pretty_name
+from django.core.exceptions import ValidationError
 
 
 class CreateCommunityForm(forms.ModelForm):
     name = forms.CharField(required=True, label="Community name", widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': '90s Music'}))
     description = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': 'form-control input-lg'}))
+    picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+
+    def clean_picture(self):
+        picture = self.cleaned_data['picture']
+        if picture and picture.size > 1024 * 1024:
+            raise ValidationError("Image file too large ( > 1mb )")
+        else:
+            return picture
 
     class Meta:
         model = Community
-        fields = ["name", "description", "is_public"]
+        fields = ["name", "description", "picture", "is_public"]
 
 
 class TemplateForm(forms.ModelForm):

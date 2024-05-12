@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from django.db import models
@@ -9,6 +10,12 @@ User = get_user_model()
 django_engine = engines['django']
 
 
+def community_photo_upload(self, filename):
+    extension = filename.split('.')[-1]
+    filename = 'community_{}.{}'.format(self.id, extension)
+    return os.path.join('community_photos/', filename)
+
+
 class Community(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)
@@ -17,6 +24,7 @@ class Community(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_communities')
     moderators = models.ManyToManyField(User, related_name='moderated_communities')
     followers = models.ManyToManyField(User, related_name='followed_communities')
+    picture = models.ImageField(upload_to=community_photo_upload, blank=True, null=True)
 
     def __str__(self):
         return self.name

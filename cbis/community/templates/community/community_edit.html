@@ -1,10 +1,10 @@
 {% extends 'community/base.html' %}
-{% block title %}Create a new community{% endblock %}
+{% block title %}Edit community {{ community.name }}{% endblock %}
 
 {% block content %}
     <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
-        <legend><span class="col-sm-offset-1">Create a community</span></legend>
+        <legend><span class="col-sm-offset-1">Edit {{ community.name }}</span></legend>
         {% for field in form %}
             <div class="mb-3">
                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
@@ -15,8 +15,14 @@
                 {% if field.help_text %}
                     <div class="form-text">{{ field.help_text }}</div>
                 {% endif %}
+            {% if field.name == 'picture' and community.picture %}
+                <div class="text-center">
+                    <p>Current picture</p>
+                    <img src="{{ community.picture.url }}" width="200px" class="rounded" alt="Community picture">
+                </div>
+            {% endif %}
             </div>
         {% endfor %}
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Save</button>
           </form>
 {% endblock %}

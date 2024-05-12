@@ -34,7 +34,7 @@ def community_create(request):
         create_form = CreateCommunityForm()
         return render(request, 'community/community_create.html', {'form': create_form})
     elif request.method == 'POST':
-        create_form = CreateCommunityForm(request.POST)
+        create_form = CreateCommunityForm(request.POST, files=request.FILES)
         if create_form.is_valid():
             community = create_form.save(commit=False)
             community.owner = request.user
@@ -43,6 +43,25 @@ def community_create(request):
         else:
             messages.warning(request, "Please fix the form errors")
             return render(request, 'community/community_create.html', {'form': create_form})
+
+
+def community_edit(request, commid):
+    try:
+        community = Community.objects.get(pk=commid)
+    except Community.DoesNotExist:
+        raise Http404
+    if request.method == 'GET':
+        create_form = CreateCommunityForm(instance=community)
+        return render(request, 'community/community_edit.html', {'form': create_form, 'community': community})
+    elif request.method == 'POST':
+        create_form = CreateCommunityForm(instance=community, data=request.POST, files=request.FILES)
+        if create_form.is_valid():
+            community = create_form.save()
+            community.save()
+            return HttpResponseRedirect(reverse("community_detail", args=(community.id,)))
+        else:
+            messages.warning(request, "Please fix the form errors")
+            return render(request, 'community/community_edit.html', {'form': create_form, 'community': community})
 
 
 def community_detail(request, commid):

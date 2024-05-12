@@ -3,7 +3,13 @@
 
 {% block content %}
     <div class="card">
-  <h5 class="card-header">{{ community.name }}</h5>
+    <div class="card-header">
+        {% if community.picture %}<img src="{{ community.picture.url }}" width="100px" class="rounded float-start pe-1" alt="Community Picture">{% endif %}
+        <h5 class="float-start">{{ community.name }}</h5>
+        {% if is_moderator or is_owner %}
+            <a href="{% url 'community_edit' community.id %}" class="btn btn-primary float-end">Edit community</a>
+        {% endif %}
+    </div>
   <div class="card-body">
     <p class="card-text">{{ community.description }}</p>
       {% if is_moderator or is_owner %}
