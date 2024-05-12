@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/font/bootstrap-icons.min.css' %}">
     <title>{% block title %}{% endblock %}</title>
     {% block additional_styles %}
     {% endblock %}
@@ -48,12 +49,21 @@
         <div id="sidebar" class="col-md-3 bg-light min-vh-100">
             {% block sidebar %}
                 <legend><span class="col-sm-offset-1">Welcome, {{ request.user.username }}!</span></legend>
+                {% if request.user.avatar %}
+                    <div class="text-center">
+                        <img src="{{ request.user.avatar.url }}" width="200px" class="rounded-circle" alt="Profile avatar">
+                    </div>
+                    <br/>
+                {% endif %}
                 <div class="d-grid gap-2">
+                <a href="{% url 'profile-edit' %}" class="btn btn-success btn-lg">
+				    <i class="bi-person-circle"></i> Edit profile
+			    </a>
                 <a href="{% url 'community_create' %}" class="btn btn-success btn-lg">
-				    Create a community
+				    <i class="bi-globe"></i> Create a community
 			    </a>
                 <a href="{% url 'logout' %}" class="btn btn-danger btn-lg">
-				    Logout
+				    <i class="bi-door-open-fill"></i> Logout
 			    </a>
                 </div>
             {% endblock %}

@@ -1,3 +1,4 @@
+import os
 import uuid
 from django.utils import timezone
 from django.db import models
@@ -55,10 +56,17 @@ class UserManager(BaseUserManager):
         return obj, created
 
 
+def user_avatar_upload(self, filename):
+    extension = filename.split('.')[-1]
+    filename = 'user_{}.{}'.format(self.id, extension)
+    return os.path.join('avatars/', filename)
+
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=255, unique=True, blank=True)
     about_me = models.TextField(blank=True, default="")
+    avatar = models.ImageField(upload_to=user_avatar_upload, blank=True, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

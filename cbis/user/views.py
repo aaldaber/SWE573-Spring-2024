@@ -1,7 +1,9 @@
 import uuid
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from .forms import SignupForm
+from .forms import SignupForm, ProfileForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 def signup(request):
@@ -19,3 +21,19 @@ def signup(request):
     else:
         form = SignupForm()
     return render(request, 'user/signup.html', {'form': form})
+
+
+@login_required
+def profile_edit(request):
+    if request.method == 'POST':
+        form = ProfileForm(instance=request.user, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile was updated successfully")
+            return render(request, 'user/profile_edit.html', {'form': form})
+        else:
+            messages.warning(request, "Please fix the errors below")
+            return render(request, 'user/profile_edit.html', {'form': form})
+    else:
+        form = ProfileForm(instance=request.user)
+    return render(request, 'user/profile_edit.html', {'form': form})

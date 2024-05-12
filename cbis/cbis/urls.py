@@ -26,6 +26,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='user/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path("", comm_views.index, name="index"),
+    path("profile-edit/", user_views.profile_edit, name="profile-edit"),
     path("communities/", comm_views.community_list, name="community_list"),
     path("communities/create/", comm_views.community_create, name="community_create"),
     path("communities/<uuid:commid>/", comm_views.community_detail, name="community_detail"),
