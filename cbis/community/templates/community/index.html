@@ -1,10 +1,42 @@
 {% extends "community/base.html" %}
 {% block title %}Homepage{% endblock %}
 {% block content %}
-    <legend><span class="col-sm-offset-1">Latest 10 posts</span></legend>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="latest-tab" data-bs-toggle="tab" data-bs-target="#latest" type="button" role="tab" aria-controls="latest" aria-selected="true">Latest</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="nav-link" id="lastday-tab" data-bs-toggle="tab" data-bs-target="#lastday" type="button" role="tab" aria-controls="lastday" aria-selected="false">Most viewed in 24 hours</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="false">All time most viewed</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="latest" role="tabpanel" aria-labelledby="latest-tab">
+        <legend><span class="col-sm-offset-1">Latest 10 posts</span></legend>
         <ul>
-            {% for post in posts %}
-                <li><a href="{% url 'postdetail' post.community.id post.id %}">{{ post.title }}</a> in {{ post.community.name }} by <i>{{ post.author.username }}</i></li>
+            {% for post in latest_posts %}
+                <li><a href="{% url 'postdetail' post.community.id post.id %}">{{ post.title }}</a> in <mark>{{ post.community.name }}</mark> by <i>{{ post.author.username }}</i> on <small class="text-secondary">{{ post.date_created }}</small></li>
             {% endfor %}
         </ul>
+    </div>
+    <div class="tab-pane fade" id="lastday" role="tabpanel" aria-labelledby="lastday-tab">
+        <legend><span class="col-sm-offset-1">Most viewed 10 posts in last 24 hours</span></legend>
+        <ul>
+            {% for post in most_viewed_today %}
+                <li><a href="{% url 'postdetail' post.community.id post.id %}">{{ post.title }}</a> in <mark>{{ post.community.name }}</mark> by <i>{{ post.author.username }}</i> on <small class="text-secondary">{{ post.date_created }}</small> ({{ post.views }} views)</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all-tab">
+        <legend><span class="col-sm-offset-1">Most viewed 10 posts of all time</span></legend>
+        <ul>
+            {% for post in most_viewed_all %}
+                <li><a href="{% url 'postdetail' post.community.id post.id %}">{{ post.title }}</a> in <mark>{{ post.community.name }}</mark> by <i>{{ post.author.username }}</i> on <small class="text-secondary">{{ post.date_created }}</small> ({{ post.view_count }} views)</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
 {% endblock %}

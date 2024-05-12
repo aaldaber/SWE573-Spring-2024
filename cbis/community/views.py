@@ -3,12 +3,13 @@ from django.contrib import messages
 from django.shortcuts import render
 from .models import Community, Post, PostTemplate, TemplateField, PostField
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.urls import reverse
 from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm
 from .signals import post_viewed
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 @login_required
@@ -17,8 +18,19 @@ def index(request):
                                                       Q(community__moderators=request.user) |
                                                       Q(community__owner=request.user) |
                                                       Q(community__is_public=True)).order_by('-date_created')[:10]
+    one_day_ago = timezone.now() - timezone.timedelta(hours=24)
+    most_viewed_posts_today = Post.objects.filter((Q(community__followers=request.user) |
+                                                      Q(community__moderators=request.user) |
+                                                      Q(community__owner=request.user) |
+                                                      Q(community__is_public=True)) & (Q(postviews__view_date__gte=one_day_ago) & Q(postviews__view_date__lte=timezone.now()))).annotate(views=Count("postviews", filter=Q(postviews__view_date__gte=one_day_ago) & Q(postviews__view_date__lte=timezone.now()))).order_by('-views', '-date_created')[:10]
+    most_viewed_posts_all_time = Post.objects.filter(Q(community__followers=request.user) |
+                                                      Q(community__moderators=request.user) |
+                                                      Q(community__owner=request.user) |
+                                                      Q(community__is_public=True)).order_by('-view_count', '-date_created')[:10]
     list_of_public_communities = Community.objects.filter(is_public=True)
-    return render(request, 'community/index.html', {'posts': latest_posts_in_communities})
+    return render(request, 'community/index.html', {'latest_posts': latest_posts_in_communities,
+                                                    'most_viewed_today': most_viewed_posts_today,
+                                                    'most_viewed_all': most_viewed_posts_all_time})
 
 
 def post_detail(request, commid, postid):

@@ -170,8 +170,8 @@ class PostField(models.Model):
 
 
 class PostViews(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="postviews")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="viewedposts")
     view_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
