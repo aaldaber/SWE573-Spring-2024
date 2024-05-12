@@ -111,17 +111,21 @@ def community_detail(request, commid):
                                                                'is_owner': is_owner})
 
 
+@login_required
 def community_list(request):
-    communities = Community.objects.all()
+    communities = Community.objects.filter(Q(is_public=True) | Q(owner=request.user) | Q(followers=request.user) | Q(moderators=request.user)).annotate(follower_count=Count("followers"))
     return render(request, 'community/community_list.html', {'community_list': communities})
 
 
+@login_required
 def community_templates_list(request, commid):
     try:
         community = Community.objects.get(pk=commid)
         is_member = request.user.followed_communities.filter(id=community.id).exists()
         is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
         is_owner = request.user.owned_communities.filter(id=community.id).exists()
+        if not is_member and not is_moderator and not is_owner:
+            return HttpResponseForbidden()
     except Community.DoesNotExist:
         raise Http404
 
@@ -175,6 +179,7 @@ def validate_template_json(data, community, user, create_or_edit, template=None)
         return JsonResponse({"template": template.id})
 
 
+@login_required
 def community_templates_create(request, commid):
     try:
         community = Community.objects.get(pk=commid)
@@ -194,6 +199,7 @@ def community_templates_create(request, commid):
             return JsonResponse({"error": "Request error, please check your data"}, status=400)
 
 
+@login_required
 def community_templates_edit(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
@@ -225,6 +231,7 @@ def community_templates_edit(request, commid, template_id):
             return JsonResponse({"error": "Request error, please check your data"}, status=400)
 
 
+@login_required
 def community_templates_preview(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
@@ -238,6 +245,7 @@ def community_templates_preview(request, commid, template_id):
         return render(request, 'community/template_preview.html', {'form': form, 'template': template})
 
 
+@login_required
 def community_new_post(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)

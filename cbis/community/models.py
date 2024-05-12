@@ -25,8 +25,8 @@ class Community(models.Model):
     description = models.TextField()
     is_public = models.BooleanField(default=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_communities')
-    moderators = models.ManyToManyField(User, related_name='moderated_communities')
-    followers = models.ManyToManyField(User, related_name='followed_communities')
+    moderators = models.ManyToManyField(User, blank=True, related_name='moderated_communities')
+    followers = models.ManyToManyField(User, blank=True, related_name='followed_communities')
     picture = models.ImageField(upload_to=community_photo_upload, blank=True, null=True)
 
     def __str__(self):
