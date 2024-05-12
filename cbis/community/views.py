@@ -6,6 +6,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonRespons
 from django.db.models import Q
 from django.urls import reverse
 from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm
+from .signals import post_viewed
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 
@@ -23,6 +24,7 @@ def index(request):
 def post_detail(request, commid, postid):
     try:
         post = Post.objects.get(pk=postid, community__id=commid)
+        post_viewed.send(sender=None, instance=post, request=request)
     except Post.DoesNotExist:
         raise Http404
     return render(request, 'community/post_detail.html', {'content': post.get_html_content(),

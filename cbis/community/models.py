@@ -5,6 +5,9 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.template import engines
 from django.core.exceptions import ValidationError
+from django.dispatch import receiver
+from .signals import post_viewed
+from django.db.models import F
 
 User = get_user_model()
 django_engine = engines['django']
@@ -96,9 +99,10 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     date_created = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)
+    view_count = models.BigIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.author.username}'s post in {self.community.name}"
+        return f"{self.title} in {self.community.name}"
 
     def get_html_content(self):
         full_html = ''
@@ -163,3 +167,23 @@ class PostField(models.Model):
     class Meta:
         verbose_name = "Post Field"
         verbose_name_plural = "Post Fields"
+
+
+class PostViews(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    view_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Post View"
+        verbose_name_plural = "Post Views"
+        unique_together = ('post', 'user', )
+
+
+@receiver(post_viewed)
+def update_post_count(sender, instance, request, **kwargs):
+    if request.user.is_authenticated:
+        if not PostViews.objects.filter(post=instance, user=request.user).exists():
+            PostViews(post=instance, user=request.user).save()
+            instance.view_count = F("view_count") + 1
+            instance.save(update_fields=["view_count"])
