@@ -19,7 +19,7 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class SignupForm(UserCreationForm):
-    username = forms.CharField(max_length=255, help_text="A random username will be generated if you leave this field blank")
+    username = forms.CharField(required=False, max_length=255, help_text="A random username will be generated if you leave this field blank")
     email = forms.EmailField(max_length=200, help_text='Required')
 
     class Meta:
