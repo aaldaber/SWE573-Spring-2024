@@ -29,6 +29,10 @@ class Community(models.Model):
     followers = models.ManyToManyField(User, blank=True, related_name='followed_communities')
     picture = models.ImageField(upload_to=community_photo_upload, blank=True, null=True)
 
+    @property
+    def follower_count(self):
+        return self.followers.count()
+
     def __str__(self):
         return self.name
 

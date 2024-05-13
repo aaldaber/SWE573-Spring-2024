@@ -113,7 +113,7 @@ def community_detail(request, commid):
 
 @login_required
 def community_list(request):
-    communities = Community.objects.filter(Q(is_public=True) | Q(owner=request.user) | Q(followers=request.user) | Q(moderators=request.user)).annotate(follower_count=Count("followers"))
+    communities = Community.objects.filter(Q(is_public=True) | Q(owner=request.user) | Q(followers=request.user) | Q(moderators=request.user))
     return render(request, 'community/community_list.html', {'community_list': communities})
 
 
@@ -285,3 +285,20 @@ def community_new_post(request, commid, template_id):
                                                                'form1': form1,
                                                                'template': template,
                                                                'community': community})
+
+
+@login_required
+def join_community(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if request.method == 'POST' and is_ajax:
+        try:
+            data = json.load(request)['payload']
+            community = Community.objects.get(pk=data['commid'])
+            if community.is_public:
+                community.followers.add(request.user)
+                return JsonResponse({"message": "success"})
+            else:
+                return JsonResponse({"error": "this is a private community"})
+        except Exception as e:
+            print(str(e))
+            return JsonResponse({"error": "Request error, please check your data"}, status=400)
