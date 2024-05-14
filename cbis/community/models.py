@@ -171,12 +171,12 @@ class PostField(models.Model):
         elif self.template_field.data_type == TemplateField.GEOLOCATION:
             template = ('{% load leaflet_tags %}'
                         '<script>'
-                        'function map_init_basic_' + self.template_field.label +
+                        'function map_init_basic_' + str(self.id) +
                         ' (map, options) {'
                         'L.marker({{content}}).addTo(map); map.setView({{content}}, 10);'
                         '}'
                         '</script>'
-                        '{% leaflet_map "') + self.template_field.label + '" callback="window.map_init_basic_' + self.template_field.label + '" %}'
+                        '{% leaflet_map "') + "map_{}".format(self.id) + '" callback="window.map_init_basic_' + str(self.id) + '" %}'
             data = str(self.content_geolocation)
         template = django_engine.from_string(template)
         return template.render({"content": data}, request=None)
