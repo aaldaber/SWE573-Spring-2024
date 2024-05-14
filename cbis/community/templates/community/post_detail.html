@@ -1,4 +1,9 @@
 {% extends "community/base.html" %}
+{% load leaflet_tags %}
+{% block additional_headers %}
+    {% leaflet_js plugins="formcustom" %}
+    {% leaflet_css plugins="forms" %}
+{% endblock %}
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
     <div class="card">

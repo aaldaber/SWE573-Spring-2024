@@ -1,5 +1,6 @@
 asgiref==3.7.2
 Django==4.2
+django-leaflet==0.30.0
 gunicorn
 Pillow
 psycopg[binary]

@@ -67,6 +67,7 @@ class TemplateField(models.Model):
     DATETIME = "datetime"
     FILE = "file"
     IMAGE = "image"
+    GEOLOCATION = "geolocation"
 
     TYPE_CHOICES = (
         (TEXT, "Text"),
@@ -78,6 +79,7 @@ class TemplateField(models.Model):
         (DATETIME, "Datetime"),
         (FILE, "File"),
         (IMAGE, "Image"),
+        (GEOLOCATION, "Geolocation")
     )
     template = models.ForeignKey(PostTemplate, on_delete=models.CASCADE, related_name='fields')
     data_type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=100)
@@ -133,6 +135,7 @@ class PostField(models.Model):
     content_file = models.FileField(upload_to='post_files/', blank=True, null=True)
     content_date = models.DateField(blank=True, null=True)
     content_datetime = models.DateTimeField(blank=True, null=True)
+    content_geolocation = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.post} - {self.template_field.label}"
@@ -165,6 +168,16 @@ class PostField(models.Model):
         elif self.template_field.data_type == TemplateField.DATETIME:
             template = "{{ content }}"
             data = self.content_datetime
+        elif self.template_field.data_type == TemplateField.GEOLOCATION:
+            template = ('{% load leaflet_tags %}'
+                        '<script>'
+                        'function map_init_basic_' + self.template_field.label +
+                        ' (map, options) {'
+                        'L.marker({{content}}).addTo(map); map.setView({{content}}, 10);'
+                        '}'
+                        '</script>'
+                        '{% leaflet_map "') + self.template_field.label + '" callback="window.map_init_basic_' + self.template_field.label + '" %}'
+            data = str(self.content_geolocation)
         template = django_engine.from_string(template)
         return template.render({"content": data}, request=None)
 
@@ -182,6 +195,19 @@ class PostViews(models.Model):
         verbose_name = "Post View"
         verbose_name_plural = "Post Views"
         unique_together = ('post', 'user', )
+
+
+# class JoinRequest(models.Model):
+#     community = models.ForeignKey(Community, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     approved = models.BooleanField(default=False)
+#     request_date = models.DateTimeField(auto_now_add=True)
+#     approved_date = models.DateTimeField(null=True, blank=True)
+#
+#     class Meta:
+#         verbose_name = "Join Request"
+#         verbose_name_plural = "Join Requests"
+#         unique_together = ('community', 'user',)
 
 
 @receiver(post_viewed)

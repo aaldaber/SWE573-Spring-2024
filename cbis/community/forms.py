@@ -2,6 +2,8 @@ from django import forms
 from .models import PostTemplate, Community
 from django.forms.utils import pretty_name
 from django.core.exceptions import ValidationError
+from leaflet.forms.widgets import LeafletWidget
+from leaflet.forms.fields import PointField
 
 
 class CreateCommunityForm(forms.ModelForm):
@@ -58,3 +60,5 @@ class TemplatePreviewForm(forms.Form):
                 self.fields[field_name] = forms.FileField(required=each.required, widget=forms.FileInput(attrs={'class': 'form-control'}))
             elif each.data_type == "image":
                 self.fields[field_name] = forms.ImageField(required=each.required, widget=forms.FileInput(attrs={'class': 'form-control'}))
+            elif each.data_type == "geolocation":
+                self.fields[field_name] = PointField(required=each.required, widget=LeafletWidget())

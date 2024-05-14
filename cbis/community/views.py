@@ -101,8 +101,9 @@ def community_detail(request, commid):
         is_owner = request.user.owned_communities.filter(id=community.id).exists()
         if not community.is_public and not is_member and \
                 not is_moderator and not is_owner:
-            return HttpResponseForbidden()
-        posts = community.posts.all().order_by('-date_created')
+            posts = community.posts.none()
+        else:
+            posts = community.posts.all().order_by('-date_created')
     except Community.DoesNotExist:
         raise Http404
 
@@ -271,7 +272,10 @@ def community_new_post(request, commid, template_id):
             for each in template.fields.all().order_by('order'):
                 if form.cleaned_data.get(each.label):
                     post_field = PostField(post=new_post, template_field=each)
-                    setattr(post_field, "content_{}".format(each.data_type), form.cleaned_data.get(each.label))
+                    if each.data_type == "geolocation":
+                        setattr(post_field, "content_{}".format(each.data_type), [form.cleaned_data.get(each.label).y, form.cleaned_data.get(each.label).x])
+                    else:
+                        setattr(post_field, "content_{}".format(each.data_type), form.cleaned_data.get(each.label))
                     post_field.save()
             return HttpResponseRedirect(reverse("postdetail", args=(community.id, new_post.id,)))
         else:
@@ -298,7 +302,8 @@ def join_community(request):
                 community.followers.add(request.user)
                 return JsonResponse({"message": "success"})
             else:
-                return JsonResponse({"error": "this is a private community"})
+                messages.success(request, "Your request to join this community has been received by our moderators.")
+                return JsonResponse({"message": "success"})
         except Exception as e:
             print(str(e))
             return JsonResponse({"error": "Request error, please check your data"}, status=400)

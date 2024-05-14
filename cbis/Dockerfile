@@ -6,6 +6,9 @@ ENV APP_GROUP=app
 
 RUN addgroup --system --gid 500 $APP_GROUP && adduser --system --uid 500 $APP_USER --ingroup $APP_GROUP
 
+RUN apt-get update -qq
+RUN apt-get install -y libproj-dev libgeos-dev gdal-bin libgdal-dev
+
 ENV APP_HOME=/app
 RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/staticfiles

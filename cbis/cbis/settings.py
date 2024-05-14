@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'user',
-    'community'
+    'community',
+
+    'leaflet'
 ]
 
 MIDDLEWARE = [
@@ -143,3 +145,18 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
 LOGOUT_REDIRECT_URL = '/login/'
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (41.0, 29.0),
+    'DEFAULT_ZOOM': 10,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'DEFAULT_PRECISION': 6,
+    'PLUGINS': {
+        'formcustom': {
+            'js': ['leaflet/draw/leaflet.draw.js',
+                   'leaflet/leaflet.forms.js'],
+            'auto-include': False,
+        },
+    }
+}

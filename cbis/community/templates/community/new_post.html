@@ -1,4 +1,9 @@
 {% extends "community/base.html" %}
+{% load leaflet_tags %}
+{% block additional_headers %}
+    {% leaflet_js plugins="formcustom" %}
+    {% leaflet_css plugins="forms" %}
+{% endblock %}
 {% block title %}New post in community {{ community.name }}{% endblock %}
 {% block content %}
     <form method="post" enctype="multipart/form-data">
