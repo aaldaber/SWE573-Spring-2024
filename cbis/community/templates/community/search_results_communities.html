@@ -1,0 +1,13 @@
+{% extends "community/base.html" %}
+{% block title %}Search communities{% endblock %}
+{% block content %}
+        {% if not community_list %}
+            <h2>No search results for your query.</h2>
+        {% else %}
+        <ul>
+            {% for community in community_list %}
+                <li><a href="{% url 'community_detail' community.id %}">{{ community.name }}</a> {{ community.follower_count }} <i class="bi-person"></i></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+{% endblock %}

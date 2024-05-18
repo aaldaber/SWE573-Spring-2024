@@ -38,4 +38,5 @@ urlpatterns = [
     path("communities/<uuid:commid>/templates/preview/<uuid:template_id>/", comm_views.community_templates_preview, name="community_templates_preview"),
     path("communities/<uuid:commid>/create-post/<uuid:template_id>/", comm_views.community_new_post, name="community_new_post"),
     path("communities/<uuid:commid>/<int:postid>/", comm_views.post_detail, name="postdetail"),
+    path("search/community/", comm_views.community_search, name="community_search")
 ]

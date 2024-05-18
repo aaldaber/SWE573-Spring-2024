@@ -10,6 +10,7 @@ from .signals import post_viewed
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from watson import search
 
 
 @login_required
@@ -307,3 +308,14 @@ def join_community(request):
         except Exception as e:
             print(str(e))
             return JsonResponse({"error": "Request error, please check your data"}, status=400)
+
+
+@login_required
+def community_search(request):
+    if request.method == 'GET':
+        query = request.GET.get("q")
+        if not query or len(query) < 3:
+            results = []
+        else:
+            results = search.filter(Community, query)
+        return render(request, "community/search_results_communities.html", {"community_list": results})

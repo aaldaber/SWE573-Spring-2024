@@ -29,8 +29,8 @@
               <a class="nav-link" href="{% url 'community_list' %}">Communities</a>
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <form class="d-flex" role="search" action="{% url 'community_search' %}">
+            <input class="form-control me-2" type="search" placeholder="Search (min. 3 chars)" name="q" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Go</button>
           </form>
         </div>
