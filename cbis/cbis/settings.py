@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'user',
     'community',
 
-    'leaflet'
+    'leaflet',
+    'watson'
 ]
 
 MIDDLEWARE = [
