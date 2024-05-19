@@ -63,6 +63,10 @@ def community_create(request):
             community = create_form.save(commit=False)
             community.owner = request.user
             community.save()
+            # adding a default template
+            template = PostTemplate(community=community, name="Default template", created_by=request.user)
+            template.save()
+            TemplateField(template=template, data_type=TemplateField.TEXTAREA, label="Post text", required=True).save()
             return HttpResponseRedirect(reverse("community_list"))
         else:
             messages.warning(request, "Please fix the form errors")
