@@ -61,3 +61,41 @@ class TemplatePreviewForm(forms.Form):
                 self.fields[field_name] = forms.ImageField(required=each.required, widget=forms.FileInput(attrs={'class': 'form-control'}))
             elif each.data_type == "geolocation":
                 self.fields[field_name] = PointField(required=each.required, widget=LeafletWidget())
+
+
+class TemplateSearchForm(forms.Form):
+    post_title = forms.CharField(max_length=255, required=False,
+                                 widget=forms.TextInput(attrs={'class': 'form-control input-lg'}))
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop("fields")
+        super().__init__(*args, **kwargs)
+        for each in fields:
+            field_name = each.label
+            if each.data_type == "text":
+                self.fields[field_name] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control input-lg'}))
+            if each.data_type == "textarea":
+                self.fields[field_name] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control input-lg'}))
+            elif each.data_type == "integer":
+                self.fields[field_name+"_from"] = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'class': 'form-control input-lg'}))
+                self.fields[field_name + "_to"] = forms.IntegerField(required=False, widget=forms.NumberInput(
+                    attrs={'class': 'form-control input-lg'}))
+            elif each.data_type == "boolean":
+                self.fields[field_name] = forms.BooleanField(required=False)
+            elif each.data_type == "float":
+                self.fields[field_name+"_from"] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': 'form-control input-lg'}))
+                self.fields[field_name + "_to"] = forms.FloatField(required=False, widget=forms.NumberInput(
+                    attrs={'class': 'form-control input-lg'}))
+            elif each.data_type == "date":
+                self.fields[field_name+"_from"] = forms.DateField(required=False, input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'class': 'form-control input-lg', 'type': 'date'}))
+                self.fields[field_name + "_to"] = forms.DateField(required=False, input_formats=['%Y-%m-%d'],
+                                                                    widget=forms.DateInput(
+                                                                        attrs={'class': 'form-control input-lg',
+                                                                               'type': 'date'}))
+            elif each.data_type == "datetime":
+                self.fields[field_name+"_from"] = forms.DateTimeField(required=False, input_formats=['%Y-%m-%dT%H:%M'], widget=forms.DateTimeInput(attrs={'class': 'form-control input-lg', 'type': 'datetime-local'}))
+                self.fields[field_name + "_to"] = forms.DateTimeField(required=False,
+                                                                        input_formats=['%Y-%m-%dT%H:%M'],
+                                                                        widget=forms.DateTimeInput(
+                                                                            attrs={'class': 'form-control input-lg',
+                                                                                   'type': 'datetime-local'}))

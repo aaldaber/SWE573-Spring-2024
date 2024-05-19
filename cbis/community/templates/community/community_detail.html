@@ -17,6 +17,14 @@
       {% endif %}
   {% if is_moderator or is_owner or is_member %}
   <a href="{% url 'community_templates_list' community.id %}" class="btn btn-primary">New post</a>
+      {% if templates %}
+      <select class="form-select mt-3" id="advanced_search" aria-label="Select a template">
+          <option value="none_selected" selected>Select a template for advanced search</option>
+          {% for template in templates %}
+          <option data-url="{% url 'community_template_search' community.id template.id %}" value="{{ template.id }}">{{ template.name }}</option>
+            {% endfor %}
+      </select>
+          {% endif %}
   {% else %}
   <a href="#" id="join" class="btn btn-primary">Join</a>
   {% endif %}
@@ -39,6 +47,15 @@
 {% endblock %}
 {% block additional_scripts %}
     <script>
+    $('select[id="advanced_search"]').change(function(){
+
+    if ($(this).val() == "none_selected"){
+
+     }
+    else {
+        window.location.replace($(this).find(':selected').attr('data-url'));
+    }
+    });
     function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {

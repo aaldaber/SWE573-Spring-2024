@@ -5,7 +5,7 @@ from .models import Community, Post, PostTemplate, TemplateField, PostField
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.db.models import Q, Count
 from django.urls import reverse
-from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm
+from .forms import CreateCommunityForm, TemplateForm, TemplatePreviewForm, PostForm, TemplateSearchForm
 from .signals import post_viewed
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
@@ -110,7 +110,8 @@ def community_detail(request, commid):
 
     return render(request, 'community/community_detail.html', {'community': community, 'posts': posts,
                                                                'is_member': is_member, 'is_moderator': is_moderator,
-                                                               'is_owner': is_owner})
+                                                               'is_owner': is_owner,
+                                                               'templates': community.post_templates.all()})
 
 
 @login_required
@@ -245,6 +246,59 @@ def community_templates_preview(request, commid, template_id):
     if request.method == 'GET':
         form = TemplatePreviewForm(fields=template.fields.all().order_by('order'))
         return render(request, 'community/template_preview.html', {'form': form, 'template': template})
+
+
+@login_required
+def community_template_search(request, commid, template_id):
+    try:
+        community = Community.objects.get(pk=commid)
+        template = PostTemplate.objects.get(pk=template_id, community=community)
+    except Community.DoesNotExist:
+        raise Http404
+    except PostTemplate.DoesNotExist:
+        raise Http404
+    if request.method == 'GET':
+        form = TemplateSearchForm(fields=template.fields.all().order_by('order'))
+        return render(request, 'community/template_search.html', {'form': form, 'template': template})
+    elif request.method == 'POST':
+        form = TemplateSearchForm(fields=template.fields.all().order_by('order'), data=request.POST)
+        if form.is_valid():
+            range_filters = {}
+            all_posts = set()
+            main_queryset = PostField.objects.filter(template_field__template=template, post__community=community)
+            title = form.cleaned_data.pop('post_title', None)
+            if title:
+                community_queryset = Post.objects.filter(community=community, template=template)
+                posts = search.filter(community_queryset, title)
+                all_posts.update(posts.values_list('id', flat=True))
+            for eachname, eachvalue in form.cleaned_data.items():
+                if eachvalue:
+                    if not eachname.endswith("_to") and not eachname.endswith("_from"):
+                        if (template.fields.get(label=eachname).data_type == TemplateField.TEXT or
+                                template.fields.get(label=eachname).data_type == TemplateField.TEXTAREA):
+                            text_queryset = search.filter(main_queryset, eachvalue)
+                            print("text_queryset", text_queryset)
+                            all_posts.update(text_queryset.values_list('post__id', flat=True))
+                    else:
+                        field_name = eachname.replace("_to", "").replace("_from", "")
+                        field_type = template.fields.get(label=field_name).data_type
+                        if (field_type == TemplateField.INTEGER or
+                            field_type == TemplateField.FLOAT or
+                            field_type == TemplateField.DATETIME or
+                            field_type == TemplateField.DATE):
+                            if eachname.endswith("_from"):
+                                range_filters["content_{}".format(field_type)+"__gte"] = eachvalue
+                            elif eachname.endswith("_to"):
+                                range_filters["content_{}".format(field_type)+"__lte"] = eachvalue
+            if range_filters:
+                range_queryset = main_queryset.filter(**range_filters)
+                all_posts.update(range_queryset.values_list('post__id', flat=True))
+            posts = Post.objects.filter(id__in=list(all_posts))
+            return render(request, 'community/template_search.html', {'form': form, 'posts': posts,
+                                                                  'template': template, 'community': community})
+        else:
+            form = TemplateSearchForm(fields=template.fields.all().order_by('order'), data=request.POST)
+            return render(request, 'community/template_search.html', {'form': form, 'template': template})
 
 
 @login_required
