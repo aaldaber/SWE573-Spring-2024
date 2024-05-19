@@ -191,7 +191,11 @@ def community_templates_create(request, commid):
         community = Community.objects.get(pk=commid)
     except Community.DoesNotExist:
         raise Http404
+    is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+    is_owner = request.user.owned_communities.filter(id=community.id).exists()
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_moderator and not is_owner:
+        return HttpResponseForbidden()
     if request.method == 'GET':
         form = TemplateForm()
         return render(request, 'community/template_create.html', {'form': form,
@@ -214,7 +218,11 @@ def community_templates_edit(request, commid, template_id):
         raise Http404
     except PostTemplate.DoesNotExist:
         raise Http404
+    is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+    is_owner = request.user.owned_communities.filter(id=community.id).exists()
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_moderator and not is_owner:
+        return HttpResponseForbidden()
     if request.method == 'GET':
         if template.posts.count():
             return render(request, 'community/template_edit_forbidden.html', {'posts': template.posts.all()})
@@ -242,6 +250,11 @@ def community_templates_preview(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
         template = PostTemplate.objects.get(pk=template_id, community=community)
+        is_member = request.user.followed_communities.filter(id=community.id).exists()
+        is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+        is_owner = request.user.owned_communities.filter(id=community.id).exists()
+        if not is_member and not is_moderator and not is_owner:
+            return HttpResponseForbidden()
     except Community.DoesNotExist:
         raise Http404
     except PostTemplate.DoesNotExist:
@@ -256,6 +269,11 @@ def community_template_search(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
         template = PostTemplate.objects.get(pk=template_id, community=community)
+        is_member = request.user.followed_communities.filter(id=community.id).exists()
+        is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+        is_owner = request.user.owned_communities.filter(id=community.id).exists()
+        if not is_member and not is_moderator and not is_owner:
+            return HttpResponseForbidden()
     except Community.DoesNotExist:
         raise Http404
     except PostTemplate.DoesNotExist:
@@ -280,7 +298,6 @@ def community_template_search(request, commid, template_id):
                         if (template.fields.get(label=eachname).data_type == TemplateField.TEXT or
                                 template.fields.get(label=eachname).data_type == TemplateField.TEXTAREA):
                             text_queryset = search.filter(main_queryset, eachvalue)
-                            print("text_queryset", text_queryset)
                             all_posts.update(text_queryset.values_list('post__id', flat=True))
                     else:
                         field_name = eachname.replace("_to", "").replace("_from", "")
@@ -309,6 +326,11 @@ def community_new_post(request, commid, template_id):
     try:
         community = Community.objects.get(pk=commid)
         template = PostTemplate.objects.get(pk=template_id, community=community)
+        is_member = request.user.followed_communities.filter(id=community.id).exists()
+        is_moderator = request.user.moderated_communities.filter(id=community.id).exists()
+        is_owner = request.user.owned_communities.filter(id=community.id).exists()
+        if not is_member and not is_moderator and not is_owner:
+            return HttpResponseForbidden()
     except Community.DoesNotExist:
         raise Http404
     except PostTemplate.DoesNotExist:
