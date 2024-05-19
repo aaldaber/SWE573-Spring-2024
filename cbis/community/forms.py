@@ -1,6 +1,5 @@
 from django import forms
 from .models import PostTemplate, Community
-from django.forms.utils import pretty_name
 from django.core.exceptions import ValidationError
 from leaflet.forms.widgets import LeafletWidget
 from leaflet.forms.fields import PointField
@@ -53,9 +52,9 @@ class TemplatePreviewForm(forms.Form):
             elif each.data_type == "float":
                 self.fields[field_name] = forms.FloatField(required=each.required, widget=forms.NumberInput(attrs={'class': 'form-control input-lg'}))
             elif each.data_type == "date":
-                self.fields[field_name] = forms.DateField(required=each.required, input_formats=['%d-%m-%Y'], label="{} (DD-MM-YYYY)".format(pretty_name(field_name)), widget=forms.DateInput(attrs={'class': 'form-control input-lg'}))
+                self.fields[field_name] = forms.DateField(required=each.required, input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'class': 'form-control input-lg', 'type': 'date'}))
             elif each.data_type == "datetime":
-                self.fields[field_name] = forms.DateTimeField(required=each.required, input_formats=['%d-%m-%Y %H:%M'], label="{} (DD-MM-YYYY HH:MM)".format(pretty_name(field_name)), widget=forms.DateTimeInput(attrs={'class': 'form-control input-lg'}))
+                self.fields[field_name] = forms.DateTimeField(required=each.required, input_formats=['%Y-%m-%dT%H:%M'], widget=forms.DateTimeInput(attrs={'class': 'form-control input-lg', 'type': 'datetime-local'}))
             elif each.data_type == "file":
                 self.fields[field_name] = forms.FileField(required=each.required, widget=forms.FileInput(attrs={'class': 'form-control'}))
             elif each.data_type == "image":
