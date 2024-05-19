@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Community, Post, TemplateField, PostField, PostTemplate
+from .models import Community, Post, TemplateField, PostField, PostTemplate, JoinRequest
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -11,3 +11,4 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(TemplateField)
 admin.site.register(PostField)
 admin.site.register(PostTemplate)
+admin.site.register(JoinRequest)
