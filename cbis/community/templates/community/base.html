@@ -15,36 +15,34 @@
 <body>
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg bg-body-tertiary bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#"><img src="{% static 'img/logo.jpeg' %}" width="60px"></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'index' %}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'community_list' %}">Communities</a>
-            </li>
-          </ul>
-          <form class="d-flex" role="search" action="{% url 'community_search' %}">
-            <input class="form-control me-2" type="search" placeholder="Search (min. 3 chars)" name="q" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Go</button>
-          </form>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><img src="{% static 'img/logo.jpeg' %}" width="60px"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'community_list' %}">Communities</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'community_search' %}">
+                    <input class="form-control me-2" type="search" placeholder="Search (min. 3 chars)" name="q" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Go</button>
+                </form>
+            </div>
         </div>
-      </div>
     </nav>
     <div class="row">
         <div id="content" class="col-md-9">
-        {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">
-  {{ message }}
-</div>
-    {% endfor %}
-{% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             {% block content %}{% endblock %}
         </div>
         <div id="sidebar" class="col-md-3 bg-light min-vh-100">
@@ -57,15 +55,15 @@
                     <br/>
                 {% endif %}
                 <div class="d-grid gap-2">
-                <a href="{% url 'profile-edit' %}" class="btn btn-success btn-lg">
-				    <i class="bi-person-circle"></i> Edit profile
-			    </a>
-                <a href="{% url 'community_create' %}" class="btn btn-success btn-lg">
-				    <i class="bi-globe"></i> Create a community
-			    </a>
-                <a href="{% url 'logout' %}" class="btn btn-danger btn-lg">
-				    <i class="bi-door-open-fill"></i> Logout
-			    </a>
+                    <a href="{% url 'profile-edit' %}" class="btn btn-success btn-lg">
+                        <i class="bi-person-circle"></i> Edit profile
+                    </a>
+                    <a href="{% url 'community_create' %}" class="btn btn-success btn-lg">
+                        <i class="bi-globe"></i> Create a community
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-danger btn-lg">
+                        <i class="bi-door-open-fill"></i> Logout
+                    </a>
                 </div>
             {% endblock %}
         </div>
