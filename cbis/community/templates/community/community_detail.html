@@ -29,7 +29,10 @@
         <h5 class="mb-1">{{ post.title }}</h5>
       <small>{{ post.date_created }}</small>
     </div>
-    <small>{{ post.author.username }}</small>
+      <div class="d-flex w-100 justify-content-between">
+    <small>by <mark>{{ post.author.username }}</mark></small>
+    <small><i class="bi-eye"></i> {{ post.view_count }}</small>
+      </div>
   </a>
   {% endfor %}
 </div>
