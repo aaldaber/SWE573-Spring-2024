@@ -18,7 +18,7 @@ def index(request):
     latest_posts_in_communities = Post.objects.filter(Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |
                                                       Q(community__owner=request.user) |
-                                                      Q(community__is_public=True)).order_by('-date_created')[:10]
+                                                      Q(community__is_public=True)).distinct().order_by('-date_created')[:10]
     one_day_ago = timezone.now() - timezone.timedelta(hours=24)
     most_viewed_posts_today = Post.objects.filter((Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |
@@ -27,7 +27,7 @@ def index(request):
     most_viewed_posts_all_time = Post.objects.filter(Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |
                                                       Q(community__owner=request.user) |
-                                                      Q(community__is_public=True)).order_by('-view_count', '-date_created')[:10]
+                                                      Q(community__is_public=True)).distinct().order_by('-view_count', '-date_created')[:10]
     return render(request, 'community/index.html', {'latest_posts': latest_posts_in_communities,
                                                     'most_viewed_today': most_viewed_posts_today,
                                                     'most_viewed_all': most_viewed_posts_all_time})
@@ -119,7 +119,7 @@ def community_detail(request, commid):
 
 @login_required
 def community_list(request):
-    communities = Community.objects.filter(Q(is_public=True) | Q(owner=request.user) | Q(followers=request.user) | Q(moderators=request.user))
+    communities = Community.objects.filter(Q(is_public=True) | Q(owner=request.user) | Q(followers=request.user) | Q(moderators=request.user)).distinct()
     return render(request, 'community/community_list.html', {'community_list': communities})
 
 
@@ -225,7 +225,7 @@ def community_templates_edit(request, commid, template_id):
         return HttpResponseForbidden()
     if request.method == 'GET':
         if template.posts.count():
-            return render(request, 'community/template_edit_forbidden.html', {'posts': template.posts.all()})
+            return render(request, 'community/template_edit_forbidden.html')
         else:
             form = TemplateForm(initial={"name": template.name})
             return render(request, 'community/template_edit.html', {'form': form,
