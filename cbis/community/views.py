@@ -28,7 +28,6 @@ def index(request):
                                                       Q(community__moderators=request.user) |
                                                       Q(community__owner=request.user) |
                                                       Q(community__is_public=True)).order_by('-view_count', '-date_created')[:10]
-    list_of_public_communities = Community.objects.filter(is_public=True)
     return render(request, 'community/index.html', {'latest_posts': latest_posts_in_communities,
                                                     'most_viewed_today': most_viewed_posts_today,
                                                     'most_viewed_all': most_viewed_posts_all_time})
