@@ -12,7 +12,7 @@
 </div>
         <ul>
             {% for template in template_list %}
-                <li>{{ template.name }}{% if is_owner or is_moderator %}<a href="{% url 'community_templates_preview' community.id template.id %}" class="btn btn-outline-primary">Preview</a>{% endif %}{% if is_owner or is_moderator %}<a href="{% url 'community_templates_edit' community.id template.id %}" class="btn btn-outline-primary">Edit</a>{% endif %}<a href="{% url 'community_new_post' community.id template.id %}" class="btn btn-outline-primary">New Post</a></li>
+                <li>{{ template.name }}<a href="{% url 'community_templates_preview' community.id template.id %}" class="btn btn-outline-primary">Preview</a>{% if is_owner or is_moderator %}<a href="{% url 'community_templates_edit' community.id template.id %}" class="btn btn-outline-primary">Edit</a>{% endif %}<a href="{% url 'community_new_post' community.id template.id %}" class="btn btn-outline-primary">New Post</a></li>
             {% endfor %}
         </ul>
 {% endblock %}
