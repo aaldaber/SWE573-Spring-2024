@@ -20,10 +20,11 @@ def index(request):
                                                       Q(community__owner=request.user) |
                                                       Q(community__is_public=True)).distinct().order_by('-date_created')[:10]
     one_day_ago = timezone.now() - timezone.timedelta(hours=24)
-    most_viewed_posts_today = Post.objects.filter((Q(community__followers=request.user) |
+    most_viewed_posts_today = Post.objects.filter(Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |
                                                       Q(community__owner=request.user) |
-                                                      Q(community__is_public=True)) & (Q(postviews__view_date__gte=one_day_ago) & Q(postviews__view_date__lte=timezone.now()))).annotate(views=Count("postviews", filter=Q(postviews__view_date__gte=one_day_ago) & Q(postviews__view_date__lte=timezone.now()))).order_by('-views', '-date_created')[:10]
+                                                      Q(community__is_public=True)).distinct()
+    most_viewed_posts_today = most_viewed_posts_today.filter(postviews__view_date__gte=one_day_ago, postviews__view_date__lte=timezone.now()).annotate(views=Count("postviews", filter=Q(postviews__view_date__gte=one_day_ago) & Q(postviews__view_date__lte=timezone.now()))).order_by('-views', '-date_created')[:10]
     most_viewed_posts_all_time = Post.objects.filter(Q(community__followers=request.user) |
                                                       Q(community__moderators=request.user) |
                                                       Q(community__owner=request.user) |
