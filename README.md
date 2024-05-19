@@ -1,5 +1,5 @@
 # Welcome to CBIS
-![logo.jpeg](logo.jpeg)
+<p style="text-align: center"><img src="logo.jpeg" alt="drawing" width="300"/><br/></p>
 CBIS is a community-based information system. The aim of this project is to assist people in creating various communities and making it easier for users to discover information within the interested communities.
 
 Tech Stack:
