@@ -1,7 +1,7 @@
 import json
 from django.contrib import messages
 from django.shortcuts import render
-from .models import Community, Post, PostTemplate, TemplateField, PostField
+from .models import Community, Post, PostTemplate, TemplateField, PostField, JoinRequest
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.db.models import Q, Count
 from django.urls import reverse
@@ -360,6 +360,7 @@ def join_community(request):
                 community.followers.add(request.user)
                 return JsonResponse({"message": "success"})
             else:
+                JoinRequest(community=community, user=request.user).save()
                 messages.success(request, "Your request to join this community has been received by our moderators.")
                 return JsonResponse({"message": "success"})
         except Exception as e:

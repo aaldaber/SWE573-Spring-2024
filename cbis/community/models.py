@@ -197,17 +197,17 @@ class PostViews(models.Model):
         unique_together = ('post', 'user', )
 
 
-# class JoinRequest(models.Model):
-#     community = models.ForeignKey(Community, on_delete=models.CASCADE)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     approved = models.BooleanField(default=False)
-#     request_date = models.DateTimeField(auto_now_add=True)
-#     approved_date = models.DateTimeField(null=True, blank=True)
-#
-#     class Meta:
-#         verbose_name = "Join Request"
-#         verbose_name_plural = "Join Requests"
-#         unique_together = ('community', 'user',)
+class JoinRequest(models.Model):
+    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    approved = models.BooleanField(default=False)
+    request_date = models.DateTimeField(auto_now_add=True)
+    approved_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Join Request"
+        verbose_name_plural = "Join Requests"
+        unique_together = ('community', 'user',)
 
 
 @receiver(post_viewed)
